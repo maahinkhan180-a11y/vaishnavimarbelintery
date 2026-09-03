@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lock, Mail, LogOut, Plus, Pencil, Trash2, X, Package, Layers, Tag, ArrowLeft } from 'lucide-react';
+import { Lock, Mail, LogOut, Plus, Pencil, Trash2, X, Package, Layers, Tag, ArrowLeft, Save } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { navigate } from '@/lib/router';
@@ -115,6 +115,10 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
   const [loading, setLoading] = useState(true);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showProductForm, setShowProductForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
+  const [showSubcategoryForm, setShowSubcategoryForm] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -195,7 +199,7 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2.5 text-sm font-medium capitalize border-b-2 transition-colors ${
+            className={`px-4 py-2.5 text-sm font-medium capitalize border-b-2 transition-colors whitespace-nowrap ${
               tab === t ? 'border-stone-800 text-stone-800' : 'border-transparent text-stone-500 hover:text-stone-700'
             }`}
           >
@@ -273,7 +277,15 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
         </div>
       ) : tab === 'categories' ? (
         <div>
-          <p className="text-sm text-stone-500 mb-4">{categories.length} categories</p>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-sm text-stone-500">{categories.length} categories</p>
+            <button
+              onClick={() => { setEditingCategory(null); setShowCategoryForm(true); }}
+              className="flex items-center gap-1.5 bg-stone-800 text-white text-sm px-4 py-2 rounded-lg hover:bg-stone-900"
+            >
+              <Plus size={16} /> Add Category
+            </button>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map(cat => (
               <div key={cat.id} className="bg-white border border-stone-200 rounded-xl p-4 flex items-center gap-3">
@@ -284,6 +296,12 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
                   <h3 className="font-semibold text-stone-800 text-sm">{cat.name}</h3>
                   <p className="text-xs text-stone-500 line-clamp-1">{cat.description}</p>
                 </div>
+                <button
+                  onClick={() => { setEditingCategory(cat); setShowCategoryForm(true); }}
+                  className="p-2 text-stone-600 hover:bg-stone-100 rounded-lg"
+                >
+                  <Pencil size={16} />
+                </button>
                 <button
                   onClick={() => handleDeleteCategory(cat.id)}
                   className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
@@ -296,7 +314,15 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
         </div>
       ) : (
         <div>
-          <p className="text-sm text-stone-500 mb-4">{subcategories.length} subcategories</p>
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-sm text-stone-500">{subcategories.length} subcategories</p>
+            <button
+              onClick={() => { setEditingSubcategory(null); setShowSubcategoryForm(true); }}
+              className="flex items-center gap-1.5 bg-stone-800 text-white text-sm px-4 py-2 rounded-lg hover:bg-stone-900"
+            >
+              <Plus size={16} /> Add Subcategory
+            </button>
+          </div>
           <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -318,12 +344,20 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
                         <td className="px-4 py-3 text-sm text-stone-600 hidden md:table-cell">{parentCat?.name ?? '-'}</td>
                         <td className="px-4 py-3 text-sm text-stone-600 hidden md:table-cell">{productCount}</td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => handleDeleteSubcategory(sub.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => { setEditingSubcategory(sub); setShowSubcategoryForm(true); }}
+                              className="p-2 text-stone-600 hover:bg-stone-100 rounded-lg"
+                            >
+                              <Pencil size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteSubcategory(sub.id)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -344,6 +378,309 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
           onSaved={() => { setShowProductForm(false); setEditingProduct(null); loadData(); }}
         />
       )}
+      {showCategoryForm && (
+        <CategoryForm
+          category={editingCategory}
+          onClose={() => { setShowCategoryForm(false); setEditingCategory(null); }}
+          onSaved={() => { setShowCategoryForm(false); setEditingCategory(null); loadData(); }}
+        />
+      )}
+      {showSubcategoryForm && (
+        <SubcategoryForm
+          subcategory={editingSubcategory}
+          categories={categories}
+          onClose={() => { setShowSubcategoryForm(false); setEditingSubcategory(null); }}
+          onSaved={() => { setShowSubcategoryForm(false); setEditingSubcategory(null); loadData(); }}
+        />
+      )}
+    </div>
+  );
+}
+
+function CategoryForm({
+  category,
+  onClose,
+  onSaved,
+}: {
+  category: Category | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: category?.name ?? '',
+    slug: category?.slug ?? '',
+    description: category?.description ?? '',
+    image_url: category?.image_url ?? '',
+    display_order: category?.display_order.toString() ?? '0',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    const slug = formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    const payload = {
+      name: formData.name,
+      slug,
+      description: formData.description || null,
+      image_url: formData.image_url || null,
+      display_order: parseInt(formData.display_order) || 0,
+    };
+
+    let result;
+    if (category) {
+      result = await supabase.from('categories').update(payload).eq('id', category.id);
+    } else {
+      result = await supabase.from('categories').insert(payload);
+    }
+
+    if (result.error) {
+      setError(result.error.message);
+      setSaving(false);
+    } else {
+      onSaved();
+    }
+  };
+
+  const update = (field: string, value: string) => setFormData(prev => ({ ...prev, [field]: value }));
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-stone-800">{category ? 'Edit Category' : 'Add Category'}</h2>
+          <button onClick={onClose} className="text-stone-500 hover:text-stone-700">
+            <X size={24} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Category Name *</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={e => update('name', e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Slug (auto if empty)</label>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={e => update('slug', e.target.value)}
+              placeholder="auto-generated"
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={e => update('description', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
+            <input
+              type="url"
+              value={formData.image_url}
+              onChange={e => update('image_url', e.target.value)}
+              placeholder="https://..."
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Display Order</label>
+            <input
+              type="number"
+              value={formData.display_order}
+              onChange={e => update('display_order', e.target.value)}
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 border border-stone-300 text-stone-700 py-2.5 rounded-lg font-medium hover:bg-stone-50">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="flex-1 bg-stone-800 text-white py-2.5 rounded-lg font-medium hover:bg-stone-900 disabled:opacity-50 flex items-center justify-center gap-2">
+              {saving ? 'Saving...' : <><Save size={16} /> {category ? 'Update' : 'Create'}</>}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function SubcategoryForm({
+  subcategory,
+  categories,
+  onClose,
+  onSaved,
+}: {
+  subcategory: Subcategory | null;
+  categories: Category[];
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [formData, setFormData] = useState({
+    name: subcategory?.name ?? '',
+    slug: subcategory?.slug ?? '',
+    description: subcategory?.description ?? '',
+    image_url: subcategory?.image_url ?? '',
+    display_order: subcategory?.display_order.toString() ?? '0',
+    category_id: subcategory?.category_id ?? '',
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    if (!formData.category_id) {
+      setError('Please select a parent category');
+      setSaving(false);
+      return;
+    }
+
+    const slug = formData.slug || formData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+    const payload = {
+      name: formData.name,
+      slug,
+      description: formData.description || null,
+      image_url: formData.image_url || null,
+      display_order: parseInt(formData.display_order) || 0,
+      category_id: formData.category_id,
+    };
+
+    let result;
+    if (subcategory) {
+      result = await supabase.from('subcategories').update(payload).eq('id', subcategory.id);
+    } else {
+      result = await supabase.from('subcategories').insert(payload);
+    }
+
+    if (result.error) {
+      setError(result.error.message);
+      setSaving(false);
+    } else {
+      onSaved();
+    }
+  };
+
+  const update = (field: string, value: string) => setFormData(prev => ({ ...prev, [field]: value }));
+
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-stone-800">{subcategory ? 'Edit Subcategory' : 'Add Subcategory'}</h2>
+          <button onClick={onClose} className="text-stone-500 hover:text-stone-700">
+            <X size={24} />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Parent Category *</label>
+            <select
+              value={formData.category_id}
+              onChange={e => update('category_id', e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            >
+              <option value="">Select category</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Subcategory Name *</label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={e => update('name', e.target.value)}
+              required
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Slug (auto if empty)</label>
+            <input
+              type="text"
+              value={formData.slug}
+              onChange={e => update('slug', e.target.value)}
+              placeholder="auto-generated"
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Description</label>
+            <textarea
+              value={formData.description}
+              onChange={e => update('description', e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Image URL</label>
+            <input
+              type="url"
+              value={formData.image_url}
+              onChange={e => update('image_url', e.target.value)}
+              placeholder="https://..."
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-stone-700 mb-1">Display Order</label>
+            <input
+              type="number"
+              value={formData.display_order}
+              onChange={e => update('display_order', e.target.value)}
+              className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg">
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose} className="flex-1 border border-stone-300 text-stone-700 py-2.5 rounded-lg font-medium hover:bg-stone-50">
+              Cancel
+            </button>
+            <button type="submit" disabled={saving} className="flex-1 bg-stone-800 text-white py-2.5 rounded-lg font-medium hover:bg-stone-900 disabled:opacity-50 flex items-center justify-center gap-2">
+              {saving ? 'Saving...' : <><Save size={16} /> {subcategory ? 'Update' : 'Create'}</>}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

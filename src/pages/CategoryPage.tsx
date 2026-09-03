@@ -51,51 +51,54 @@ export function CategoryPage({ categorySlug, subcategorySlug }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      supabase.from('categories').select('*').eq('slug', categorySlug).maybeSingle(),
-      supabase.from('subcategories').select('*').eq('category_id', `(select id from categories where slug='${categorySlug}')`).order('display_order'),
-    ]).then(async ([catRes, subRes]) => {
-      setCategory(catRes.data);
-      setSubcategories(subRes.data ?? []);
-    });
-  }, [categorySlug]);
-
-  useEffect(() => {
-    if (subcategorySlug) {
-      supabase
-        .from('products')
-        .select('*')
-        .eq('subcategory_id', `(select id from subcategories where slug='${subcategorySlug}')`)
-        .order('display_order')
-        .then(({ data }) => {
-          setProducts(data ?? []);
+    supabase
+      .from('categories')
+      .select('*')
+      .eq('slug', categorySlug)
+      .maybeSingle()
+      .then(async ({ data: cat }) => {
+        setCategory(cat);
+        if (!cat) {
+          setSubcategories([]);
+          setProducts([]);
           setLoading(false);
-        });
-    } else if (category) {
-      // Get all products for all subcategories in this category
-      supabase
-        .from('subcategories')
-        .select('id')
-        .eq('category_id', category.id)
-        .then(({ data: subs }) => {
-          if (!subs || subs.length === 0) {
+          return;
+        }
+        const { data: subs } = await supabase
+          .from('subcategories')
+          .select('*')
+          .eq('category_id', cat.id)
+          .order('display_order');
+        setSubcategories(subs ?? []);
+
+        if (subcategorySlug) {
+          const sub = (subs ?? []).find(s => s.slug === subcategorySlug);
+          if (sub) {
+            const { data: prods } = await supabase
+              .from('products')
+              .select('*')
+              .eq('subcategory_id', sub.id)
+              .order('display_order');
+            setProducts(prods ?? []);
+          } else {
             setProducts([]);
-            setLoading(false);
-            return;
           }
-          const subIds = subs.map(s => s.id);
-          supabase
-            .from('products')
-            .select('*')
-            .in('subcategory_id', subIds)
-            .order('display_order')
-            .then(({ data }) => {
-              setProducts(data ?? []);
-              setLoading(false);
-            });
-        });
-    }
-  }, [categorySlug, subcategorySlug, category]);
+        } else {
+          const subIds = (subs ?? []).map(s => s.id);
+          if (subIds.length === 0) {
+            setProducts([]);
+          } else {
+            const { data: prods } = await supabase
+              .from('products')
+              .select('*')
+              .in('subcategory_id', subIds)
+              .order('display_order');
+            setProducts(prods ?? []);
+          }
+        }
+        setLoading(false);
+      });
+  }, [categorySlug, subcategorySlug]);
 
   const brands = useMemo(() => {
     const set = new Set<string>();
