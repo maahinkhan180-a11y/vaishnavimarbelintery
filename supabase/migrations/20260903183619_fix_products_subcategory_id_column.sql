@@ -13,6 +13,9 @@ BEGIN
   END IF;
 END $$;
 
+-- Ensure is_featured column exists (may not exist if table pre-dated this schema)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS is_featured boolean NOT NULL DEFAULT false;
+
 -- Indexes for common queries
 CREATE INDEX IF NOT EXISTS idx_subcategories_category ON subcategories(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_subcategory ON products(subcategory_id);
