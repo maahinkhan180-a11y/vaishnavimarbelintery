@@ -154,6 +154,47 @@ export function HomePage() {
         </div>
       </section>
 
+      {/* Meet the Owner */}
+      <section className="max-w-7xl mx-auto px-4 py-16">
+        <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center">
+            <div className="relative h-72 md:h-96 bg-stone-100">
+              <img
+                src="/onwer.png"
+                alt="Owner of Vaishnavi Marble"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-8 md:p-12">
+              <p className="text-amber-600 font-medium text-sm tracking-wider uppercase mb-2">Meet the Owner</p>
+              <h2 className="text-3xl font-bold text-stone-800 mb-4">Welcome to Vaishnavi Marble</h2>
+              <p className="text-stone-600 leading-relaxed mb-4">
+                At Vaishnavi Marble, we bring you the finest selection of marble, tiles, sanitaryware, and handcrafted marble statues. With years of experience in the industry, we take pride in offering premium quality products at the best prices across Kolkata.
+              </p>
+              <p className="text-stone-600 leading-relaxed mb-6">
+                Our commitment to excellence and customer satisfaction has made us a trusted name for homeowners, builders, and interior designers alike. Visit our showroom to explore our exclusive collection.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <a
+                  href="tel:+919330300408"
+                  className="inline-block bg-stone-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors"
+                >
+                  Call Us
+                </a>
+                <a
+                  href={whatsappEnquiry('I would like to know more about your products.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 border border-stone-300 text-stone-700 px-6 py-3 rounded-lg font-semibold hover:bg-stone-50 transition-colors"
+                >
+                  <MessageCircle size={18} /> WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="bg-stone-800 rounded-2xl p-10 md:p-16 text-center text-white">
