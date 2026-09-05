@@ -1,30 +1,10 @@
-import { useState } from 'react';
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Check, MessageCircle } from 'lucide-react';
+import { Minus, Plus, Trash2, ShoppingBag, MessageCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { navigate } from '@/lib/router';
 import { whatsappCartOrder } from '@/lib/whatsapp';
 
 export function CartPage() {
   const { items, updateQuantity, removeFromCart, totalPrice, totalItems, clearCart } = useCart();
-  const [orderPlaced, setOrderPlaced] = useState(false);
-
-  if (orderPlaced) {
-    return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Check size={40} className="text-green-600" />
-        </div>
-        <h1 className="text-2xl font-bold text-stone-800 mb-3">Order Placed Successfully!</h1>
-        <p className="text-stone-500 mb-6">Thank you for your purchase. Our team will contact you shortly to confirm your order and arrange delivery.</p>
-        <button
-          onClick={() => { clearCart(); navigate('/'); }}
-          className="bg-stone-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-stone-900 transition-colors"
-        >
-          Continue Shopping
-        </button>
-      </div>
-    );
-  }
 
   if (items.length === 0) {
     return (
@@ -150,15 +130,8 @@ export function CartPage() {
             </div>
 
             <button
-              onClick={() => setOrderPlaced(true)}
-              className="w-full bg-stone-800 text-white py-3 rounded-lg font-semibold hover:bg-stone-900 transition-colors mt-4 flex items-center justify-center gap-2"
-            >
-              Place Order <ArrowRight size={18} />
-            </button>
-
-            <button
               onClick={handleWhatsAppOrder}
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mt-3 flex items-center justify-center gap-2"
+              className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mt-4 flex items-center justify-center gap-2"
             >
               <MessageCircle size={20} /> Order on WhatsApp
             </button>
