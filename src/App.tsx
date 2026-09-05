@@ -12,6 +12,7 @@ import { CartPage } from '@/pages/CartPage';
 import { SearchPage } from '@/pages/SearchPage';
 import { AdminPage } from '@/pages/AdminPage';
 import { AlertCircle } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 function RouteRenderer() {
   const { route } = useRouter();
@@ -56,6 +57,7 @@ function App() {
           <Footer />
           <CartDrawer />
         </div>
+        <Analytics />
       </CartProvider>
     </AuthProvider>
   );
