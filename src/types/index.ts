@@ -52,3 +52,18 @@ export interface CartItem {
   product: Product;
   quantity: number;
 }
+
+export interface BlogArticle {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  featured_image_url: string | null;
+  category: string;
+  author: string;
+  published_at: string;
+  updated_at: string;
+  tags: string[];
+  is_published: boolean;
+}
