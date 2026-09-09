@@ -11,6 +11,8 @@ import { ProductPage } from '@/pages/ProductPage';
 import { CartPage } from '@/pages/CartPage';
 import { SearchPage } from '@/pages/SearchPage';
 import { AdminPage } from '@/pages/AdminPage';
+import { BlogPage } from '@/pages/BlogPage';
+import { BlogArticlePage } from '@/pages/BlogArticlePage';
 import { AlertCircle } from 'lucide-react';
 
 function RouteRenderer() {
@@ -31,6 +33,10 @@ function RouteRenderer() {
       return <SearchPage query={route.query} />;
     case 'admin':
       return <AdminPage />;
+    case 'blog':
+      return <BlogPage />;
+    case 'blogArticle':
+      return <BlogArticlePage slug={route.slug} />;
     default:
       return <HomePage />;
   }
