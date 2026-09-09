@@ -1,16 +1,47 @@
-import { useState, useEffect } from 'react';
-import { ArrowRight, Star, TrendingUp, Package, Award, MessageCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { ArrowRight, Star, TrendingUp, Package, Award, MessageCircle, ChevronLeft, ChevronRight, Phone, MapPin, Truck, ShieldCheck, Headphones } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { navigate } from '@/lib/router';
 import type { Category, Product } from '@/types';
 import { ProductCard } from '@/components/ProductCard';
-import { CategoryCarousel } from '@/components/CategoryCarousel';
 import { whatsappEnquiry } from '@/lib/whatsapp';
+
+const HERO_SLIDES = [
+  {
+    image: 'https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    title: 'Premium Marble & Tiles',
+    subtitle: 'Exquisite craftsmanship for your dream home',
+    cta: 'Shop Marble Statues',
+    link: '/category/marble-statues',
+  },
+  {
+    image: 'https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    title: 'Designer Kitchen & Bath Tiles',
+    subtitle: 'Transform your spaces with style',
+    cta: 'Explore Tiles',
+    link: '/category/tiles',
+  },
+  {
+    image: 'https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    title: 'Marble, Granite & Sanitaryware',
+    subtitle: 'Kolkata\u2019s leading destination for quality',
+    cta: 'View All Products',
+    link: '/category/marble-granite',
+  },
+  {
+    image: 'https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+    title: 'Marble Statues & Mandirs',
+    subtitle: 'Handcrafted with devotion and precision',
+    cta: 'Shop Statues',
+    link: '/category/marble-statues',
+  },
+];
 
 export function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     Promise.all([
@@ -23,95 +54,121 @@ export function HomePage() {
     });
   }, []);
 
+  const nextSlide = useCallback(() => {
+    setCurrentSlide(prev => (prev + 1) % HERO_SLIDES.length);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setCurrentSlide(prev => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length);
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 5000);
+    return () => clearInterval(timer);
+  }, [nextSlide]);
+
   return (
     <div>
-      {/* Category Carousel - right after navbar */}
-      <section>
-        <CategoryCarousel categories={categories} />
+      {/* Hero Slider */}
+      <section className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
+        {HERO_SLIDES.map((slide, idx) => (
+          <div
+            key={idx}
+            className={`absolute inset-0 transition-opacity duration-1000 ${idx === currentSlide ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          >
+            <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+            <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
+              <div className="max-w-2xl">
+                <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-3">{slide.title}</h2>
+                <p className="text-lg text-slate-200 mb-6">{slide.subtitle}</p>
+                <button
+                  onClick={() => navigate(slide.link)}
+                  className="bg-[#ff9d17] text-black px-6 py-3 rounded-sm font-bold hover:bg-white transition-colors inline-flex items-center gap-2"
+                >
+                  {slide.cta} <ArrowRight size={18} />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft size={22} />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
+          aria-label="Next slide"
+        >
+          <ChevronRight size={22} />
+        </button>
+
+        {/* Dots */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {HERO_SLIDES.map((_, idx) => (
+            <button
+              key={idx}
+              onClick={() => setCurrentSlide(idx)}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${idx === currentSlide ? 'bg-[#ff9d17] w-8' : 'bg-white/50'}`}
+              aria-label={`Go to slide ${idx + 1}`}
+            />
+          ))}
+        </div>
       </section>
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-stone-800 via-stone-900 to-stone-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <img
-            src="https://images.pexels.com/photos/6634141/pexels-photo-6634141.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
-            alt="Marble background"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="relative max-w-7xl mx-auto px-4 py-20 md:py-28">
-          <div className="max-w-2xl">
-            <p className="text-amber-400 font-medium text-sm tracking-wider uppercase mb-3">Kolkata's Leading Marble Destination</p>
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-5">
-              Vaishnavi Marble
-            </h1>
-            <p className="text-stone-300 text-lg mb-8 max-w-xl">
-              Premium tiles, sanitaryware, kitchen sinks, vanities, parking tiles, marble statues, mandirs, marble & granite. Exquisite craftsmanship at the best prices.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <button
-                onClick={() => navigate('/category/marble-statues')}
-                className="bg-white text-stone-900 px-6 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors flex items-center gap-2"
-              >
-                Shop Marble Statues <ArrowRight size={18} />
-              </button>
-              <button
-                onClick={() => navigate('/category/tiles')}
-                className="border border-stone-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-stone-800 transition-colors"
-              >
-                Shop Tiles
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="bg-stone-100 border-y border-stone-200">
-        <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Trust Strip */}
+      <section className="bg-white border-b border-stone-200">
+        <div className="max-w-7xl mx-auto px-4 py-5 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center gap-3">
-            <Package className="text-stone-700" size={32} />
+            <Truck className="text-[#ff9d17]" size={28} />
             <div>
-              <p className="text-2xl font-bold text-stone-800">90+</p>
-              <p className="text-xs text-stone-500">Products</p>
+              <p className="text-sm font-semibold text-stone-800">Fast Delivery</p>
+              <p className="text-xs text-stone-500">Pan-India shipping</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Award className="text-stone-700" size={32} />
+            <ShieldCheck className="text-[#ff9d17]" size={28} />
             <div>
-              <p className="text-2xl font-bold text-stone-800">8</p>
-              <p className="text-xs text-stone-500">Categories</p>
+              <p className="text-sm font-semibold text-stone-800">Secure Packaging</p>
+              <p className="text-xs text-stone-500">Safe & damage-proof</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <TrendingUp className="text-stone-700" size={32} />
+            <Headphones className="text-[#ff9d17]" size={28} />
             <div>
-              <p className="text-2xl font-bold text-stone-800">29+</p>
-              <p className="text-xs text-stone-500">Subcategories</p>
+              <p className="text-sm font-semibold text-stone-800">Customer Support</p>
+              <p className="text-xs text-stone-500">Mon-Sat, 9am-7pm</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <Star className="text-stone-700" size={32} />
+            <Award className="text-[#ff9d17]" size={28} />
             <div>
-              <p className="text-2xl font-bold text-stone-800">4.5+</p>
-              <p className="text-xs text-stone-500">Avg Rating</p>
+              <p className="text-sm font-semibold text-stone-800">Premium Quality</p>
+              <p className="text-xs text-stone-500">Trusted by thousands</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="max-w-7xl mx-auto px-4 py-14">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-stone-800 mb-2">Shop by Category</h2>
-          <p className="text-stone-500">Explore our wide range of quality products</p>
+          <p className="text-[#ff9d17] font-semibold text-sm tracking-wider uppercase mb-1">Our Collection</p>
+          <h2 className="text-3xl font-bold text-stone-800">Shop by Category</h2>
+          <div className="w-16 h-1 bg-[#ff9d17] mx-auto mt-3 rounded-full" />
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {categories.map(cat => (
             <button
               key={cat.id}
               onClick={() => navigate(`/category/${cat.slug}`)}
-              className="group relative aspect-square rounded-xl overflow-hidden bg-stone-100 hover:shadow-lg transition-all"
+              className="group relative aspect-square rounded-xl overflow-hidden bg-stone-100 hover:shadow-xl transition-all"
             >
               {cat.image_url && (
                 <img
@@ -120,7 +177,7 @@ export function HomePage() {
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-2 text-center">
                 <h3 className="text-white font-semibold text-xs">{cat.name}</h3>
               </div>
@@ -130,13 +187,12 @@ export function HomePage() {
       </section>
 
       {/* Featured Products */}
-      <section className="bg-stone-50 py-16">
+      <section className="bg-stone-50 py-14">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-3xl font-bold text-stone-800">Featured Products</h2>
-              <p className="text-stone-500 mt-1">Handpicked premium products for you</p>
-            </div>
+          <div className="text-center mb-10">
+            <p className="text-[#ff9d17] font-semibold text-sm tracking-wider uppercase mb-1">Handpicked for you</p>
+            <h2 className="text-3xl font-bold text-stone-800">Featured Products</h2>
+            <div className="w-16 h-1 bg-[#ff9d17] mx-auto mt-3 rounded-full" />
           </div>
           {loading ? (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -155,7 +211,7 @@ export function HomePage() {
       </section>
 
       {/* Meet the Owner */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
+      <section className="max-w-7xl mx-auto px-4 py-14">
         <div className="bg-white rounded-2xl shadow-sm border border-stone-200 overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center">
             <div className="relative h-72 md:h-96 bg-stone-100">
@@ -166,7 +222,7 @@ export function HomePage() {
               />
             </div>
             <div className="p-8 md:p-12">
-              <p className="text-amber-600 font-medium text-sm tracking-wider uppercase mb-2">Meet the Owner</p>
+              <p className="text-[#ff9d17] font-medium text-sm tracking-wider uppercase mb-2">Meet the Owner</p>
               <h2 className="text-3xl font-bold text-stone-800 mb-4">Welcome to Vaishnavi Marble</h2>
               <p className="text-stone-600 leading-relaxed mb-4">
                 At Vaishnavi Marble, we bring you the finest selection of marble, tiles, sanitaryware, and handcrafted marble statues. With years of experience in the industry, we take pride in offering premium quality products at the best prices across Kolkata.
@@ -177,7 +233,7 @@ export function HomePage() {
               <div className="flex flex-wrap gap-4">
                 <a
                   href="tel:+919330300408"
-                  className="inline-block bg-stone-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-stone-700 transition-colors"
+                  className="inline-block bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#ff9d17] hover:text-black transition-colors"
                 >
                   Call Us
                 </a>
@@ -196,16 +252,16 @@ export function HomePage() {
       </section>
 
       {/* CTA */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="bg-stone-800 rounded-2xl p-10 md:p-16 text-center text-white">
+      <section className="max-w-7xl mx-auto px-4 py-14">
+        <div className="bg-black rounded-2xl p-10 md:p-16 text-center text-white">
           <h2 className="text-3xl font-bold mb-3">Need Bulk or Wholesale Enquiry?</h2>
-          <p className="text-stone-300 mb-6 max-w-2xl mx-auto">
+          <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
             Get special pricing on bulk orders. Contact our team for personalized quotes on large quantity purchases.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <a
               href="tel:+919330300408"
-              className="inline-block bg-white text-stone-900 px-8 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors"
+              className="inline-block bg-[#ff9d17] text-black px-8 py-3 rounded-lg font-semibold hover:bg-white transition-colors"
             >
               Call +91 93303 00408
             </a>

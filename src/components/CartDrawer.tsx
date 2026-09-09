@@ -19,14 +19,14 @@ export function CartDrawer() {
       {/* Drawer */}
       <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white z-50 flex flex-col shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-stone-200 bg-gradient-to-r from-blue-900 to-blue-800 text-white">
+        <div className="flex items-center justify-between p-6 border-b border-stone-200 bg-[#071522] text-white">
           <div className="flex items-center gap-3">
             <ShoppingBag size={24} />
             <h2 className="text-xl font-bold">Shopping Cart</h2>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-2 hover:bg-blue-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-[#14263a] rounded-lg transition-colors"
             aria-label="Close cart"
           >
             <X size={24} />
@@ -42,7 +42,7 @@ export function CartDrawer() {
               <p className="text-sm text-stone-500 mt-2">Start adding products to your cart</p>
               <button
                 onClick={() => { setIsOpen(false); navigate('/'); }}
-                className="mt-4 inline-block bg-blue-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-800 transition-colors"
+                className="mt-4 inline-block bg-black text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#ff9d17] hover:text-black transition-colors"
               >
                 Continue Shopping
               </button>
@@ -65,7 +65,7 @@ export function CartDrawer() {
                 {/* Product Info */}
                 <div className="flex-1">
                   <h3 className="font-semibold text-stone-800 text-sm line-clamp-2">{item.product.name}</h3>
-                  <p className="text-lg font-bold text-blue-900 mt-1">₹{item.product.price}</p>
+                  <p className="text-lg font-bold text-stone-900 mt-1">₹{item.product.price}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
@@ -113,7 +113,7 @@ export function CartDrawer() {
               </div>
               <div className="border-t border-stone-200 pt-2 flex justify-between">
                 <span className="font-bold text-stone-800">Total:</span>
-                <span className="font-bold text-lg text-blue-900">₹{totalPrice.toFixed(2)}</span>
+                <span className="font-bold text-lg text-stone-900">₹{totalPrice.toFixed(2)}</span>
               </div>
             </div>
 
@@ -123,7 +123,7 @@ export function CartDrawer() {
                 setIsOpen(false);
                 navigate('/cart');
               }}
-              className="w-full bg-blue-900 text-white py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-[#ff9d17] hover:text-black transition-colors flex items-center justify-center gap-2"
             >
               Review Order <ArrowRight size={18} />
             </button>

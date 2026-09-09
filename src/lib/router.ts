@@ -7,6 +7,8 @@ export type Route =
   | { name: 'product'; productSlug: string }
   | { name: 'cart' }
   | { name: 'admin' }
+  | { name: 'blog' }
+  | { name: 'blogArticle'; slug: string }
   | { name: 'search'; query: string };
 
 function parseHash(): Route {
@@ -28,6 +30,10 @@ function parseHash(): Route {
 
   if (parts[0] === 'cart') return { name: 'cart' };
   if (parts[0] === 'admin') return { name: 'admin' };
+  if (parts[0] === 'blog') {
+    if (parts[1]) return { name: 'blogArticle', slug: parts[1] };
+    return { name: 'blog' };
+  }
   if (parts[0] === 'search' && parts[1]) {
     return { name: 'search', query: decodeURIComponent(parts[1]) };
   }

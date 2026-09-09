@@ -14,7 +14,7 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-blue-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-800 transition-colors;
+    @apply bg-black text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#ff9d17] hover:text-black transition-colors;
   }
 
   .btn-secondary {
@@ -54,7 +54,7 @@
   }
 
   .prose blockquote {
-    @apply border-l-4 border-blue-900 pl-4 py-2 italic text-stone-600;
+    @apply border-l-4 border-[#ff9d17] pl-4 py-2 italic text-stone-600;
   }
 }
 

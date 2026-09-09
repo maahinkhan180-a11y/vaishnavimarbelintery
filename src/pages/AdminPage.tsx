@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { navigate } from '@/lib/router';
 import type { Category, Subcategory, Product } from '@/types';
+import { BlogAdmin } from '@/components/BlogAdmin';
 
 export function AdminPage() {
   const { session, loading, signIn, signOut } = useAuth();
@@ -108,7 +109,7 @@ function AdminLogin({ signIn }: { signIn: (email: string, password: string) => P
 }
 
 function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
-  const [tab, setTab] = useState<'products' | 'categories' | 'subcategories'>('products');
+  const [tab, setTab] = useState<'products' | 'categories' | 'subcategories' | 'blog'>('products');
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
@@ -195,7 +196,7 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-stone-200 overflow-x-auto">
-        {(['products', 'categories', 'subcategories'] as const).map(t => (
+        {(['products', 'categories', 'subcategories', 'blog'] as const).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -203,13 +204,15 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
               tab === t ? 'border-stone-800 text-stone-800' : 'border-transparent text-stone-500 hover:text-stone-700'
             }`}
           >
-            {t}
+            {t === 'blog' ? 'Blog Posts' : t}
           </button>
         ))}
       </div>
 
       {loading ? (
         <p className="text-stone-400 text-center py-10">Loading...</p>
+      ) : tab === 'blog' ? (
+        <BlogAdmin />
       ) : tab === 'products' ? (
         <div>
           <div className="flex justify-between items-center mb-4">
