@@ -24,6 +24,19 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
 
+  // =====================================================
+  // LIVE DATE & TIME
+  // =====================================================
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const quickLinks = [
     'All Tiles',
     'Floor Tiles',
@@ -97,6 +110,180 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full bg-[#071522] text-white shadow-2xl">
 
       {/* =====================================================
+          LIVE BRAND / INFORMATION BAR
+      ====================================================== */}
+      <div className="w-full overflow-hidden border-b border-white/10 bg-[#0b1d2d]">
+        <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
+          <div className="flex h-9 items-center overflow-hidden">
+
+            <div className="flex min-w-max animate-[marquee_45s_linear_infinite] items-center gap-4 whitespace-nowrap text-[10px] font-semibold sm:text-[11px] md:text-xs">
+
+              <span className="font-extrabold text-[#ff9d17]">
+                VAISHNAV MARBLE SHOP
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-cyan-300">
+                Tiles
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-emerald-300">
+                Sanitaryware
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-blue-300">
+                Kitchen Sink
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-purple-300">
+                Bathroom Vanity
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-yellow-300">
+                Parking Tiles
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-pink-300">
+                Marble & Granite
+              </span>
+
+              <span className="mx-2 text-white/20">
+                |
+              </span>
+
+              <span className="text-orange-300">
+                Kajaria
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-green-300">
+                Somany
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-sky-300">
+                Orientbell
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-violet-300">
+                CERA
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-rose-300">
+                Jaquar
+              </span>
+
+              <span className="mx-2 text-white/20">
+                |
+              </span>
+
+              <span className="font-bold text-amber-300">
+                Easy EMI Available
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-green-400">
+                UPI
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-cyan-300">
+                Card
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-purple-300">
+                Bank EMI
+              </span>
+
+              <span className="mx-2 text-white/20">
+                |
+              </span>
+
+              {/* DATE */}
+              <span className="text-white">
+                📅{' '}
+                {currentDateTime.toLocaleDateString('en-IN', {
+                  day: '2-digit',
+                  month: 'short',
+                  year: 'numeric',
+                })}
+              </span>
+
+              <span className="text-white/30">
+                •
+              </span>
+
+              {/* LIVE TIME */}
+              <span className="font-bold text-[#ff9d17]">
+                🕒{' '}
+                {currentDateTime.toLocaleTimeString('en-IN', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  hour12: true,
+                })}
+              </span>
+
+              <span className="mx-2 text-white/20">
+                |
+              </span>
+
+              <span className="text-white">
+                Premium Quality
+              </span>
+
+              <span className="text-white/30">
+                •
+              </span>
+
+              <span className="text-[#ff9d17]">
+                Latest Designs
+              </span>
+
+              <span className="text-white/30">
+                •
+              </span>
+
+              <span className="text-emerald-300">
+                Trusted Brands
+              </span>
+
+              <span className="text-white/30">
+                •
+              </span>
+
+              <span className="text-cyan-300">
+                Flexible Payment Options
+              </span>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* =====================================================
           TOP HEADER
       ====================================================== */}
       <div className="w-full border-b border-white/10">
@@ -105,9 +292,7 @@ export function Header() {
 
           <div className="flex min-h-[76px] items-center gap-3">
 
-            {/* =================================================
-                MOBILE MENU
-            ================================================= */}
+            {/* MOBILE MENU */}
             <button
               type="button"
               onClick={() =>
@@ -143,9 +328,7 @@ export function Header() {
             </button>
 
 
-            {/* =================================================
-                LOGO
-            ================================================= */}
+            {/* LOGO */}
             <button
               type="button"
               onClick={() => goTo('/')}
@@ -229,9 +412,7 @@ export function Header() {
             </button>
 
 
-            {/* =================================================
-                MAIN NAVIGATION
-            ================================================= */}
+            {/* MAIN NAVIGATION */}
             <nav
               className="
                 ml-3
@@ -495,9 +676,7 @@ export function Header() {
             </nav>
 
 
-            {/* =================================================
-                RIGHT SIDE
-            ================================================= */}
+            {/* RIGHT SIDE */}
             <div
               className="
                 ml-auto
@@ -555,8 +734,6 @@ export function Header() {
                       top-1/2
                       -translate-y-1/2
                       text-slate-400
-                      transition-colors
-                      duration-300
                     "
                   />
 
@@ -564,7 +741,7 @@ export function Header() {
               </form>
 
 
-              {/* WHATSAPP / MESSAGE */}
+              {/* WHATSAPP */}
               <a
                 href={whatsappEnquiry(
                   'I have a general enquiry about your products.'
@@ -742,6 +919,7 @@ export function Header() {
                 </span>
               </button>
             ))}
+
 
             {/* MORE */}
             <button
