@@ -7,7 +7,12 @@
     @apply bg-stone-50 text-stone-900;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold text-stone-900;
   }
 }
@@ -41,7 +46,8 @@
     @apply text-xl font-bold text-stone-900 mt-6 mb-3;
   }
 
-  .prose ul, .prose ol {
+  .prose ul,
+  .prose ol {
     @apply ml-6 space-y-2;
   }
 
@@ -58,11 +64,15 @@
   }
 }
 
-/* Animations */
+/* =========================================
+   GENERAL ANIMATIONS
+   ========================================= */
+
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -73,6 +83,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -87,7 +98,49 @@
   animation: slideUp 0.3s ease-out;
 }
 
-/* Scrollbar styling */
+/* =========================================
+   VAISHNAV MARBLE SHOP MARQUEE
+   ========================================= */
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 45s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Mobile marquee speed */
+@media (max-width: 640px) {
+  .animate-marquee {
+    animation-duration: 35s;
+  }
+}
+
+/* Tablet */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .animate-marquee {
+    animation-duration: 40s;
+  }
+}
+
+/* =========================================
+   SCROLLBAR STYLING
+   ========================================= */
+
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -104,4 +157,34 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: #78716b;
+}
+
+/* =========================================
+   SMOOTH SCROLLING
+   ========================================= */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* =========================================
+   SELECTION
+   ========================================= */
+
+::selection {
+  background: #ff9d17;
+  color: #000000;
+}
+
+/* =========================================
+   FOCUS
+   ========================================= */
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #ff9d17;
+  outline-offset: 2px;
 }
