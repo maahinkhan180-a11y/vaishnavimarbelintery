@@ -23,6 +23,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // =====================================================
   // LIVE DATE & TIME
@@ -50,6 +51,19 @@ export function Header() {
     'Vitrified Tiles',
     'Other Tile Areas',
   ];
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -112,7 +126,17 @@ export function Header() {
       {/* =====================================================
           LIVE BRAND / INFORMATION BAR
       ====================================================== */}
-      <div className="w-full overflow-hidden border-b border-white/10 bg-[#0b1d2d]">
+      <div
+        className={`
+          w-full overflow-hidden border-b bg-[#0b1d2d]
+          transition-[max-height,opacity] duration-300 ease-in-out
+          ${
+            isScrolled
+              ? 'max-h-0 opacity-0 border-b-0'
+              : 'max-h-9 opacity-100 border-white/10'
+          }
+        `}
+      >
         <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
           <div className="flex h-9 items-center overflow-hidden">
 
@@ -863,7 +887,17 @@ export function Header() {
       {/* =====================================================
           SECOND CATEGORY NAVBAR
       ====================================================== */}
-      <div className="hidden w-full border-t border-white/5 lg:block">
+      <div
+        className={`
+          hidden w-full overflow-hidden lg:block
+          transition-[max-height,opacity] duration-300 ease-in-out
+          ${
+            isScrolled
+              ? 'max-h-0 opacity-0 border-t-0'
+              : 'max-h-[64px] opacity-100 border-t border-white/5'
+          }
+        `}
+      >
 
         <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
 
