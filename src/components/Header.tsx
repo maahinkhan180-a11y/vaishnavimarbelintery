@@ -1189,7 +1189,6 @@ export function Header() {
       )}
 
     </header>
-      </header>
 
       {/* =====================================================
           SECOND CATEGORY NAVBAR — NORMAL SCROLL
