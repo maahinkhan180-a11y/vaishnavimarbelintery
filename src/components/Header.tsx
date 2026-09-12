@@ -23,7 +23,6 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [categories, setCategories] = useState<Category[]>([]);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   // =====================================================
   // LIVE DATE & TIME
@@ -35,108 +34,16 @@ export function Header() {
       setCurrentDateTime(new Date());
     }, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
-
-  const quickLinks = [
-    'All Tiles',
-    'Floor Tiles',
-    'Wall Tiles',
-    'Bathroom Tiles',
-    'Kitchen Tiles',
-    'Living Room Tiles',
-    'Outdoor Tiles',
-    'Parking Tiles',
-    'Ceramic Tiles',
-    'Vitrified Tiles',
-    'Other Tile Areas',
-  ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const loadCategories = async () => {
-      const { data, error } = await supabase
-        .from('categories')
-        .select('*')
-        .order('display_order', { ascending: true });
-
-      if (!mounted) return;
-
-      if (error) {
-        console.error('Error loading categories:', error);
-        setCategories([]);
-        return;
-      }
-
-      setCategories(data ?? []);
-    };
-
-    loadCategories();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const goTo = (path: string) => {
-    navigate(path);
-    setMobileMenuOpen(false);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const query = searchQuery.trim();
-
-    if (!query) return;
-
-    navigate(`/search/${encodeURIComponent(query)}`);
-
-    setSearchQuery('');
-    setMobileMenuOpen(false);
-  };
-
-  const handleQuickLink = (label: string) => {
-    if (label === 'All Tiles') {
-      navigate('/products');
-    } else {
-      navigate(`/search/${encodeURIComponent(label)}`);
-    }
-
-    setMobileMenuOpen(false);
-  };
-
-  return (
-    <header className="sticky top-0 z-50 w-full bg-[#071522] text-white shadow-2xl">
-
+    return (
+    <>
+      {/* =====================================================
+          LIVE INFO BAR — STAYS STICKY AT THE TOP
+      ====================================================== */}
+      <div className="sticky top-0 z-[60] w-full bg-[#071522] text-white">
       {/* =====================================================
           LIVE BRAND / INFORMATION BAR
       ====================================================== */}
-      <div
-        className={`
-          w-full overflow-hidden border-b bg-[#0b1d2d]
-          transition-[max-height,opacity] duration-300 ease-in-out
-          ${
-            isScrolled
-              ? 'max-h-0 opacity-0 border-b-0'
-              : 'max-h-9 opacity-100 border-white/10'
-          }
-        `}
-      >
+      <div className="w-full overflow-hidden border-b border-white/10 bg-[#0b1d2d]">
         <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
           <div className="flex h-9 items-center overflow-hidden">
 
@@ -305,8 +212,12 @@ export function Header() {
           </div>
         </div>
       </div>
+      </div>
 
-
+      {/* =====================================================
+          MAIN HEADER — STAYS STICKY BELOW LIVE BAR
+      ====================================================== */}
+      <header className="sticky top-9 z-50 w-full bg-[#071522] text-white shadow-2xl">
       {/* =====================================================
           TOP HEADER
       ====================================================== */}
@@ -883,117 +794,6 @@ export function Header() {
         </div>
       </div>
 
-
-      {/* =====================================================
-          SECOND CATEGORY NAVBAR
-      ====================================================== */}
-      <div
-        className={`
-          hidden w-full overflow-hidden lg:block
-          transition-[max-height,opacity] duration-300 ease-in-out
-          ${
-            isScrolled
-              ? 'max-h-0 opacity-0 border-t-0'
-              : 'max-h-[64px] opacity-100 border-t border-white/5'
-          }
-        `}
-      >
-
-        <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
-
-          <div
-            className="
-              flex
-              h-[64px]
-              items-center
-              justify-center
-              gap-1
-              overflow-hidden
-              whitespace-nowrap
-              bg-[#17263b]
-            "
-          >
-
-            {quickLinks.map((label, index) => (
-              <button
-                key={label}
-                type="button"
-                onClick={() => handleQuickLink(label)}
-                className={`
-                  group
-                  flex
-                  h-full
-                  shrink-0
-                  items-center
-                  px-3
-                  text-xs
-                  font-bold
-                  text-white
-                  transition-all
-                  duration-300
-                  hover:bg-black
-                  hover:text-[#ff9d17]
-                  xl:px-4
-                  xl:text-sm
-                  ${
-                    index === 0
-                      ? 'bg-black text-[#ff9d17]'
-                      : ''
-                  }
-                `}
-              >
-                <span
-                  className="
-                    transition-transform
-                    duration-300
-                    group-hover:-translate-y-0.5
-                  "
-                >
-                  {label}
-                </span>
-              </button>
-            ))}
-
-
-            {/* MORE */}
-            <button
-              type="button"
-              className="
-                group
-                flex
-                h-full
-                shrink-0
-                items-center
-                gap-1
-                px-3
-                text-xs
-                font-bold
-                text-white
-                transition-all
-                duration-300
-                hover:bg-black
-                hover:text-[#ff9d17]
-                xl:px-4
-                xl:text-sm
-              "
-            >
-              <ChevronDown
-                size={15}
-                className="
-                  transition-transform
-                  duration-300
-                  group-hover:rotate-180
-                "
-              />
-
-              <span>More</span>
-            </button>
-
-          </div>
-        </div>
-      </div>
-
-
       {/* =====================================================
           MOBILE MENU
       ====================================================== */}
@@ -1389,5 +1189,112 @@ export function Header() {
       )}
 
     </header>
+      </header>
+
+      {/* =====================================================
+          SECOND CATEGORY NAVBAR — NORMAL SCROLL
+      ====================================================== */}
+      <div className="w-full bg-[#071522] text-white">
+      {/* =====================================================
+          SECOND CATEGORY NAVBAR
+      ====================================================== */}
+      <div className="hidden w-full border-t border-white/5 lg:block">
+
+        <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
+
+          <div
+            className="
+              flex
+              h-[64px]
+              items-center
+              justify-center
+              gap-1
+              overflow-hidden
+              whitespace-nowrap
+              bg-[#17263b]
+            "
+          >
+
+            {quickLinks.map((label, index) => (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleQuickLink(label)}
+                className={`
+                  group
+                  flex
+                  h-full
+                  shrink-0
+                  items-center
+                  px-3
+                  text-xs
+                  font-bold
+                  text-white
+                  transition-all
+                  duration-300
+                  hover:bg-black
+                  hover:text-[#ff9d17]
+                  xl:px-4
+                  xl:text-sm
+                  ${
+                    index === 0
+                      ? 'bg-black text-[#ff9d17]'
+                      : ''
+                  }
+                `}
+              >
+                <span
+                  className="
+                    transition-transform
+                    duration-300
+                    group-hover:-translate-y-0.5
+                  "
+                >
+                  {label}
+                </span>
+              </button>
+            ))}
+
+
+            {/* MORE */}
+            <button
+              type="button"
+              className="
+                group
+                flex
+                h-full
+                shrink-0
+                items-center
+                gap-1
+                px-3
+                text-xs
+                font-bold
+                text-white
+                transition-all
+                duration-300
+                hover:bg-black
+                hover:text-[#ff9d17]
+                xl:px-4
+                xl:text-sm
+              "
+            >
+              <ChevronDown
+                size={15}
+                className="
+                  transition-transform
+                  duration-300
+                  group-hover:rotate-180
+                "
+              />
+
+              <span>More</span>
+            </button>
+
+          </div>
+        </div>
+      </div>
+      </div>
+    </>
+  );
   );
 }
