@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Lock, Mail, LogOut, Plus, Pencil, Trash2, X, Package, Layers, Tag, ArrowLeft, Save } from 'lucide-react';
+import { Lock, Mail, LogOut, Plus, Pencil, Trash2, X, Package, Layers, Tag, ArrowLeft, Save, Search, Filter, Image as ImageIcon } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { navigate } from '@/lib/router';
@@ -120,6 +120,11 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingSubcategory, setEditingSubcategory] = useState<Subcategory | null>(null);
   const [showSubcategoryForm, setShowSubcategoryForm] = useState(false);
+  const [productSearch, setProductSearch] = useState('');
+  const [productCategoryFilter, setProductCategoryFilter] = useState('');
+  const [productSubcategoryFilter, setProductSubcategoryFilter] = useState('');
+  const [productBrandFilter, setProductBrandFilter] = useState('');
+  const [productStockFilter, setProductStockFilter] = useState('');
 
   const loadData = async () => {
     setLoading(true);
@@ -135,6 +140,20 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  const filteredProducts = products.filter(p => {
+    const q = productSearch.trim().toLowerCase();
+    const matchesSearch = !q || [p.name, p.brand, p.material, p.color, p.design, p.slug].some(v => String(v ?? '').toLowerCase().includes(q));
+    const sub = subcategories.find(s => s.id === p.subcategory_id);
+    const matchesCategory = !productCategoryFilter || sub?.category_id === productCategoryFilter;
+    const matchesSubcategory = !productSubcategoryFilter || p.subcategory_id === productSubcategoryFilter;
+    const matchesBrand = !productBrandFilter || String(p.brand ?? '') === productBrandFilter;
+    const matchesStock = !productStockFilter || p.stock_status === productStockFilter;
+    return matchesSearch && matchesCategory && matchesSubcategory && matchesBrand && matchesStock;
+  });
+
+  const productBrands = Array.from(new Set(products.map(p => String(p.brand ?? '').trim()).filter(Boolean))).sort();
+  const filteredSubcategoryOptions = subcategories.filter(s => !productCategoryFilter || s.category_id === productCategoryFilter);
 
   const handleDeleteProduct = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
@@ -215,14 +234,50 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
         <BlogAdmin />
       ) : tab === 'products' ? (
         <div>
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-sm text-stone-500">{products.length} products</p>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+            <div>
+              <p className="text-sm text-stone-500">{filteredProducts.length} of {products.length} products</p>
+            </div>
             <button
               onClick={() => { setEditingProduct(null); setShowProductForm(true); }}
               className="flex items-center gap-1.5 bg-stone-800 text-white text-sm px-4 py-2 rounded-lg hover:bg-stone-900"
             >
               <Plus size={16} /> Add Product
             </button>
+          </div>
+
+          <div className="bg-white border border-stone-200 rounded-xl p-4 mb-4">
+            <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-stone-700">
+              <Filter size={16} /> Product Search &amp; Filters
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="relative lg:col-span-2">
+                <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
+                <input value={productSearch} onChange={e => setProductSearch(e.target.value)} placeholder="Search name, brand, material, color..." className="w-full pl-9 pr-3 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700" />
+              </div>
+              <select value={productCategoryFilter} onChange={e => { setProductCategoryFilter(e.target.value); setProductSubcategoryFilter(''); }} className="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700">
+                <option value="">All Categories</option>
+                {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+              </select>
+              <select value={productSubcategoryFilter} onChange={e => setProductSubcategoryFilter(e.target.value)} className="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700">
+                <option value="">All Subcategories</option>
+                {filteredSubcategoryOptions.map(sub => <option key={sub.id} value={sub.id}>{sub.name}</option>)}
+              </select>
+              <select value={productBrandFilter} onChange={e => setProductBrandFilter(e.target.value)} className="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700">
+                <option value="">All Brands</option>
+                {productBrands.map(brand => <option key={brand} value={brand}>{brand}</option>)}
+              </select>
+              <select value={productStockFilter} onChange={e => setProductStockFilter(e.target.value)} className="w-full px-3 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700">
+                <option value="">All Stock Status</option>
+                <option value="In Stock">In Stock</option>
+                <option value="Out of Stock">Out of Stock</option>
+              </select>
+            </div>
+            {(productSearch || productCategoryFilter || productSubcategoryFilter || productBrandFilter || productStockFilter) && (
+              <button type="button" onClick={() => { setProductSearch(''); setProductCategoryFilter(''); setProductSubcategoryFilter(''); setProductBrandFilter(''); setProductStockFilter(''); }} className="mt-3 text-xs font-medium text-stone-600 hover:text-stone-900 underline">
+                Clear all filters
+              </button>
+            )}
           </div>
 
           <div className="bg-white border border-stone-200 rounded-xl overflow-hidden">
@@ -238,12 +293,28 @@ function AdminDashboard({ signOut }: { signOut: () => Promise<void> }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-100">
-                  {products.map(p => (
+                  {filteredProducts.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-12 text-center text-sm text-stone-500">
+                        No products match your search or filters.
+                      </td>
+                    </tr>
+                  ) : filteredProducts.map(p => (
                     <tr key={p.id} className="hover:bg-stone-50">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg overflow-hidden bg-stone-100 shrink-0">
-                            {p.image_url && <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />}
+                            {p.image_url ? (
+                              <img
+                                src={p.image_url}
+                                alt={p.name}
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                onError={e => { e.currentTarget.style.display = 'none'; }}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center"><ImageIcon size={18} className="text-stone-300" /></div>
+                            )}
                           </div>
                           <span className="text-sm font-medium text-stone-700 line-clamp-1">{p.name}</span>
                         </div>
@@ -819,10 +890,22 @@ function ProductForm({
             <input
               type="url"
               value={formData.image_url}
-              onChange={e => update('image_url', e.target.value)}
-              placeholder="https://..."
+              onChange={e => update('image_url', e.target.value.trim())}
+              placeholder="https://example.com/product-image.jpg"
               className="w-full px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-stone-700"
             />
+            {formData.image_url && (
+              <div className="mt-3 flex items-center gap-3 p-2 border border-stone-200 rounded-lg bg-stone-50">
+                <div className="w-16 h-16 rounded-md overflow-hidden bg-white border border-stone-200 shrink-0 flex items-center justify-center">
+                  <img src={formData.image_url} alt="Preview" className="w-full h-full object-cover" onError={e => { e.currentTarget.style.display = 'none'; }} />
+                  <ImageIcon size={22} className="text-stone-300" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-stone-700">Image preview</p>
+                  <p className="text-xs text-stone-400 break-all line-clamp-2">{formData.image_url}</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div>
