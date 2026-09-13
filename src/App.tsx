@@ -13,6 +13,10 @@ import { SearchPage } from '@/pages/SearchPage';
 import { AdminPage } from '@/pages/AdminPage';
 import { BlogPage } from '@/pages/BlogPage';
 import { BlogArticlePage } from '@/pages/BlogArticlePage';
+import { AboutPage } from '@/pages/AboutPage';
+import { PriceListPage } from '@/pages/PriceListPage';
+import { VideosPage } from '@/pages/VideosPage';
+import { ContactPage } from '@/pages/ContactPage';
 import { AlertCircle } from 'lucide-react';
 
 function RouteRenderer() {
