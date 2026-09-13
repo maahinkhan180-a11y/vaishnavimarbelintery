@@ -9,6 +9,13 @@ import {
   Calculator,
   Phone,
   ChevronDown,
+  ChevronRight,
+  Gem,
+  Grid3X3,
+  Bath,
+  UtensilsCrossed,
+  Building2,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 import { useCart } from '@/context/CartContext';
@@ -21,6 +28,8 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const [activeCategoryMenu, setActiveCategoryMenu] = useState<string | null>(null);
+  const [openMobileCategory, setOpenMobileCategory] = useState<string | null>(null);
 
   // =====================================================
   // LIVE DATE & TIME
@@ -59,36 +68,176 @@ export function Header() {
   };
 
   // =====================================================
-  // QUICK LINKS
+  // CATEGORY MEGA MENU DATA
   // =====================================================
-  const quickLinks = [
-    'All Products',
-    'Marble Statues',
-    'Tiles',
-    'Sanitaryware',
-    'Kitchen Sink',
-    'Bathroom Vanity',
-    'Parking Tiles',
-    'Marble & Granite',
+  const categoryImage = (name: string) =>
+    `/assets/categories/${name
+      .toLowerCase()
+      .replace(/&/g, 'and')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')}.jpg`;
+
+  const categoryMenus = [
+    {
+      name: 'Marble',
+      icon: Gem,
+      items: [
+        'Indian Marble',
+        'Imported Marble',
+        'White Marble',
+        'Black Marble',
+        'Beige Marble',
+        'Green Marble',
+        'Marble Slabs',
+        'Marble Tiles',
+      ],
+    },
+    {
+      name: 'Tiles',
+      icon: Grid3X3,
+      columns: [
+        {
+          title: 'Tiles By',
+          items: [
+            'Floor Tiles',
+            'Wall Tiles',
+            'Bathroom Tiles',
+            'Kitchen Tiles',
+            'Living Room Tiles',
+            'Outdoor Tiles',
+            'Parking Tiles',
+            'Bedroom Tiles',
+            'Elevation Tiles',
+            'Balcony Tiles',
+            'Pooja Room Tiles',
+            'Stair Tiles',
+          ],
+        },
+        {
+          title: 'Tiles Finish',
+          items: [
+            'Anti Skid Tiles',
+            'Glossy Tiles',
+            'Polished Tiles',
+            'Matt Tiles',
+            'Carving Tiles',
+            'Metallic Tiles',
+            'Rustic Tiles',
+            'Lappato Tiles',
+            'Satin Tiles',
+            'Hi-Gloss Tiles',
+            'Wall Panels',
+            'Fluted Panels',
+          ],
+        },
+        {
+          title: 'Tiles Design',
+          items: [
+            '3D Tiles',
+            'Wooden Tiles',
+            'Marble Tiles',
+            'Texture Tiles',
+            'Mosaic Tiles',
+            'Granite Tiles',
+            'Stone Tiles',
+            'Pattern Tiles',
+            'Geometric Tiles',
+            'Cement Tiles',
+            'Travertine Tiles',
+            'Terrazzo Tiles',
+          ],
+        },
+        {
+          title: 'Tiles Type',
+          items: [
+            'Vitrified Tiles',
+            'Ceramic Tiles',
+            'Porcelain Tiles',
+            'Designer Tiles',
+            'Digital Tiles',
+            'Glazed Tiles',
+            'Cool Tiles',
+            'Printed Tiles',
+            'Nano Tiles',
+            'Imported Tiles',
+            'Italian Tiles',
+            'Spanish Tiles',
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Sanitaryware',
+      icon: Bath,
+      items: [
+        'Western Toilet',
+        'Indian Toilet',
+        'Wash Basin',
+        'Counter Basin',
+        'Wall Hung',
+        'One Piece',
+        'Two Piece',
+        'Urinal',
+        'Cistern',
+        'Bathroom Accessories',
+      ],
+    },
+    {
+      name: 'Kitchen',
+      icon: UtensilsCrossed,
+      items: [
+        'Kitchen Sink',
+        'Single Bowl Sink',
+        'Double Bowl Sink',
+        'Quartz Sink',
+        'Stainless Steel Sink',
+        'Kitchen Accessories',
+      ],
+    },
+    {
+      name: 'Bathroom',
+      icon: Bath,
+      items: [
+        'Bathroom Vanity',
+        'Vanity Basin',
+        'Shower',
+        'Faucet',
+        'Mirror',
+        'Bathroom Accessories',
+      ],
+    },
+    {
+      name: 'Other',
+      icon: Building2,
+      items: [
+        'Marble Statues',
+        'Granite',
+        'Parking Tiles',
+        'Wall Panels',
+        'Fluted Panels',
+      ],
+    },
   ];
 
-  const handleQuickLink = (label: string) => {
-    const routes: Record<string, string> = {
-      'All Products': '/products',
-      'Marble Statues': '/category/marble-statues',
+  const handleCategoryClick = (label: string) => {
+    setActiveCategoryMenu(null);
+    setOpenMobileCategory(null);
+    setMobileMenuOpen(false);
+    navigate(`/products?category=${encodeURIComponent(label)}`);
+  };
+
+  const handleCategoryParentClick = (name: string) => {
+    const parentRoutes: Record<string, string> = {
+      Marble: '/products?category=Marble',
       Tiles: '/category/tiles',
       Sanitaryware: '/category/sanitaryware',
-      'Kitchen Sink': '/category/kitchen-sink',
-      'Bathroom Vanity': '/category/bathroom-vanity',
-      'Parking Tiles': '/category/parking-tiles',
-      'Marble & Granite': '/category/marble-granite',
+      Kitchen: '/category/kitchen-sink',
+      Bathroom: '/category/bathroom-vanity',
+      Other: '/products?category=Other',
     };
 
-    const path = routes[label];
-
-    if (path) {
-      goTo(path);
-    }
+    const path = parentRoutes[name];
+    if (path) goTo(path);
   };
 
   return (
@@ -906,71 +1055,346 @@ export function Header() {
       </header>
 
       {/* =====================================================
-          SECOND CATEGORY NAVBAR
+          SECOND CATEGORY NAVBAR — PREMIUM IMAGE MEGA MENU
       ====================================================== */}
-      <div className="w-full bg-[#071522] text-white">
-        <div className="hidden w-full border-t border-white/5 lg:block">
-          <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
-            <div
-              className="
-                flex h-[64px] items-center justify-center gap-1
-                overflow-hidden whitespace-nowrap bg-[#17263b]
-              "
-            >
-              {quickLinks.map((label, index) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => handleQuickLink(label)}
-                  className={`
-                    group flex h-full shrink-0 items-center
-                    px-3 text-xs font-bold text-white
-                    transition-all duration-300
-                    hover:bg-black hover:text-[#ff9d17]
-                    xl:px-4 xl:text-sm
-                    ${
-                      index === 0
-                        ? 'bg-black text-[#ff9d17]'
-                        : ''
-                    }
-                  `}
+      <div
+        className="relative z-40 w-full border-t border-white/10 bg-[#17263b] text-white"
+        onMouseLeave={() => setActiveCategoryMenu(null)}
+      >
+        <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
+
+          {/* DESKTOP SUB HEADER */}
+          <div className="hidden h-[62px] items-center justify-center gap-1 lg:flex">
+            {categoryMenus.map((menu) => {
+              const Icon = menu.icon;
+              const hasColumns = 'columns' in menu;
+
+              return (
+                <div
+                  key={menu.name}
+                  className="relative h-full"
+                  onMouseEnter={() => setActiveCategoryMenu(menu.name)}
                 >
-                  <span
-                    className="
-                      transition-transform duration-300
-                      group-hover:-translate-y-0.5
-                    "
+                  <button
+                    type="button"
+                    onClick={() => handleCategoryParentClick(menu.name)}
+                    className={`group flex h-full items-center gap-1.5 px-3 text-xs font-bold transition-all duration-200 xl:px-4 xl:text-sm ${
+                      activeCategoryMenu === menu.name
+                        ? 'bg-[#ff9d17] text-black'
+                        : 'text-white hover:bg-black hover:text-[#ff9d17]'
+                    }`}
                   >
-                    {label}
-                  </span>
-                </button>
-              ))}
+                    <Icon size={17} />
+                    <span>{menu.name}</span>
+                    <ChevronDown
+                      size={14}
+                      className={`transition-transform duration-200 ${
+                        activeCategoryMenu === menu.name ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
 
-              {/* MORE */}
-              <button
-                type="button"
-                className="
-                  group flex h-full shrink-0 items-center gap-1
-                  px-3 text-xs font-bold text-white
-                  transition-all duration-300
-                  hover:bg-black hover:text-[#ff9d17]
-                  xl:px-4 xl:text-sm
-                "
-              >
-                <ChevronDown
-                  size={15}
-                  className="
-                    transition-transform duration-300
-                    group-hover:rotate-180
-                  "
-                />
+                  {/* MARBLE / SANITARYWARE / KITCHEN / BATHROOM / OTHER */}
+                  {!hasColumns && (
+                    <div
+                      className={`absolute left-0 top-[62px] w-[760px] rounded-b-2xl border border-stone-200 bg-white p-5 text-stone-900 shadow-2xl transition-all duration-200 ${
+                        activeCategoryMenu === menu.name
+                          ? 'visible translate-y-0 opacity-100'
+                          : 'invisible -translate-y-2 opacity-0'
+                      }`}
+                    >
+                      <div className="mb-4 flex items-center justify-between border-b border-stone-200 pb-3">
+                        <div>
+                          <h3 className="text-lg font-extrabold">
+                            {menu.name}
+                          </h3>
+                          <p className="text-xs text-stone-500">
+                            Explore our {menu.name.toLowerCase()} collection
+                          </p>
+                        </div>
 
-                <span>More</span>
-              </button>
+                        <button
+                          type="button"
+                          onClick={() => handleCategoryParentClick(menu.name)}
+                          className="rounded-lg bg-stone-900 px-3 py-2 text-xs font-bold text-white transition hover:bg-[#ff9d17] hover:text-black"
+                        >
+                          View All
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-3">
+                        {menu.items?.map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => handleCategoryClick(item)}
+                            className="group overflow-hidden rounded-xl border border-stone-200 bg-stone-50 text-left transition-all duration-300 hover:-translate-y-1 hover:border-[#ff9d17] hover:bg-white hover:shadow-lg"
+                          >
+                            <div className="relative h-24 overflow-hidden bg-stone-100">
+                              <img
+                                src={categoryImage(item)}
+                                alt={item}
+                                loading="lazy"
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                onError={(event) => {
+                                  event.currentTarget.style.display = 'none';
+                                  const fallback = event.currentTarget.parentElement?.querySelector(
+                                    '[data-image-fallback]'
+                                  ) as HTMLElement | null;
+                                  if (fallback) fallback.classList.remove('hidden');
+                                }}
+                              />
+                              <div
+                                data-image-fallback
+                                className="absolute inset-0 hidden items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-stone-400"
+                              >
+                                <ImageIcon size={28} />
+                              </div>
+                              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-2 py-1">
+                                <span className="text-[10px] font-semibold text-white">
+                                  Explore
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex min-h-10 items-center justify-between gap-1 px-2.5 py-2">
+                              <span className="text-xs font-bold text-stone-700 group-hover:text-black">
+                                {item}
+                              </span>
+                              <ChevronRight
+                                size={14}
+                                className="shrink-0 text-stone-400 group-hover:text-[#ff9d17]"
+                              />
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TILES 4-COLUMN MEGA MENU */}
+                  {hasColumns && (
+                    <div
+                      className={`absolute left-1/2 top-[62px] w-[1180px] max-w-[96vw] -translate-x-1/2 rounded-b-2xl border border-stone-200 bg-white p-5 text-stone-900 shadow-2xl transition-all duration-200 ${
+                        activeCategoryMenu === menu.name
+                          ? 'visible translate-y-0 opacity-100'
+                          : 'invisible -translate-y-2 opacity-0'
+                      }`}
+                    >
+                      <div className="mb-4 flex items-center justify-between border-b border-stone-200 pb-3">
+                        <div>
+                          <h3 className="text-lg font-extrabold">
+                            Tiles Collection
+                          </h3>
+                          <p className="text-xs text-stone-500">
+                            Shop tiles by application, finish, design and type
+                          </p>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleCategoryParentClick('Tiles')}
+                          className="rounded-lg bg-stone-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-[#ff9d17] hover:text-black"
+                        >
+                          View All Tiles
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-5">
+                        {menu.columns?.map((column) => (
+                          <div key={column.title} className="min-w-0">
+                            <div className="mb-3 flex items-center gap-2 border-b border-stone-200 pb-2">
+                              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-stone-100">
+                                <Grid3X3 size={14} />
+                              </div>
+                              <h4 className="text-sm font-extrabold">
+                                {column.title}
+                              </h4>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              {column.items.map((item) => (
+                                <button
+                                  key={item}
+                                  type="button"
+                                  onClick={() => handleCategoryClick(item)}
+                                  className="group overflow-hidden rounded-lg border border-stone-200 bg-stone-50 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-[#ff9d17] hover:bg-white hover:shadow-md"
+                                >
+                                  <div className="relative h-16 overflow-hidden bg-stone-100">
+                                    <img
+                                      src={categoryImage(item)}
+                                      alt={item}
+                                      loading="lazy"
+                                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                      onError={(event) => {
+                                        event.currentTarget.style.display = 'none';
+                                        const fallback = event.currentTarget.parentElement?.querySelector(
+                                          '[data-image-fallback]'
+                                        ) as HTMLElement | null;
+                                        if (fallback) fallback.classList.remove('hidden');
+                                      }}
+                                    />
+                                    <div
+                                      data-image-fallback
+                                      className="absolute inset-0 hidden items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200 text-stone-400"
+                                    >
+                                      <ImageIcon size={21} />
+                                    </div>
+                                  </div>
+
+                                  <div className="flex min-h-9 items-center gap-1 px-2 py-1.5">
+                                    <span className="line-clamp-2 flex-1 text-[10px] font-bold leading-tight text-stone-700 group-hover:text-black">
+                                      {item}
+                                    </span>
+                                    <ChevronRight
+                                      size={12}
+                                      className="shrink-0 text-stone-400 group-hover:text-[#ff9d17]"
+                                    />
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* MOBILE SUB HEADER */}
+          <div className="lg:hidden">
+            <div className="flex gap-2 overflow-x-auto py-2 scrollbar-none">
+              {categoryMenus.map((menu) => {
+                const Icon = menu.icon;
+
+                return (
+                  <button
+                    key={menu.name}
+                    type="button"
+                    onClick={() =>
+                      setOpenMobileCategory(
+                        openMobileCategory === menu.name ? null : menu.name
+                      )
+                    }
+                    className={`flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition ${
+                      openMobileCategory === menu.name
+                        ? 'bg-[#ff9d17] text-black'
+                        : 'bg-white/5 text-white hover:bg-black'
+                    }`}
+                  >
+                    <Icon size={15} />
+                    {menu.name}
+                    <ChevronDown
+                      size={13}
+                      className={`transition-transform ${
+                        openMobileCategory === menu.name ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                );
+              })}
             </div>
+
+            {categoryMenus.map((menu) => {
+              if (openMobileCategory !== menu.name) return null;
+
+              const Icon = menu.icon;
+              const isTiles = 'columns' in menu;
+
+              return (
+                <div
+                  key={menu.name}
+                  className="border-t border-white/10 bg-[#0b1d2d] p-3"
+                >
+                  <div className="mb-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-bold">
+                      <Icon size={18} className="text-[#ff9d17]" />
+                      {menu.name}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => handleCategoryParentClick(menu.name)}
+                      className="rounded-lg bg-[#ff9d17] px-3 py-1.5 text-[10px] font-extrabold text-black"
+                    >
+                      View All
+                    </button>
+                  </div>
+
+                  {isTiles ? (
+                    <div className="space-y-4">
+                      {menu.columns?.map((column) => (
+                        <div key={column.title}>
+                          <h4 className="mb-2 text-xs font-extrabold uppercase tracking-wider text-[#ff9d17]">
+                            {column.title}
+                          </h4>
+
+                          <div className="grid grid-cols-2 gap-2">
+                            {column.items.map((item) => (
+                              <button
+                                key={item}
+                                type="button"
+                                onClick={() => handleCategoryClick(item)}
+                                className="flex items-center gap-2 overflow-hidden rounded-lg border border-white/10 bg-white/5 p-2 text-left"
+                              >
+                                <img
+                                  src={categoryImage(item)}
+                                  alt={item}
+                                  loading="lazy"
+                                  className="h-12 w-12 shrink-0 rounded-md object-cover"
+                                  onError={(event) => {
+                                    event.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                                <span className="text-[11px] font-semibold text-white">
+                                  {item}
+                                </span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                      {menu.items?.map((item) => (
+                        <button
+                          key={item}
+                          type="button"
+                          onClick={() => handleCategoryClick(item)}
+                          className="overflow-hidden rounded-lg border border-white/10 bg-white/5 text-left"
+                        >
+                          <img
+                            src={categoryImage(item)}
+                            alt={item}
+                            loading="lazy"
+                            className="h-20 w-full object-cover"
+                            onError={(event) => {
+                              event.currentTarget.style.display = 'none';
+                            }}
+                          />
+
+                          <div className="flex items-center justify-between gap-1 px-2 py-2">
+                            <span className="text-[11px] font-semibold text-white">
+                              {item}
+                            </span>
+                            <ChevronRight
+                              size={13}
+                              className="shrink-0 text-[#ff9d17]"
+                            />
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
-      </div>
-    </>
+      </div>    </>
   );
 }
