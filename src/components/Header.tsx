@@ -2,7 +2,8 @@
 import { useEffect, useState } from 'react';
 import {
   ShoppingCart, Menu, X, Search, Home, MessageCircle, Calculator, Phone,
-  ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight, Grid3X3, Gem, Bath, UtensilsCrossed, Building2,
+  Layers, Square, Warehouse, Sparkles, Image as ImageIcon,
 } from 'lucide-react';
 
 import { useCart } from '@/context/CartContext';
@@ -10,51 +11,265 @@ import { navigate } from '@/lib/router';
 import { whatsappEnquiry } from '@/lib/whatsapp';
 
 /* ============================================================
-   SECOND HEADER — QUICK LINKS
+   SECOND HEADER — TOP CATEGORIES + SUBCATEGORIES
    ============================================================ */
-const QUICK_LINKS = [
-  'Tiles',
-  'Living Room',
-  'Outdoor',
-  'Parking',
-  'Ceramic',
-  'Vitrified',
-  'Wash Basin',
-  'Kitchen Sink',
-  'Glass Blocks',
+type MegaColumn = { title: string; items: string[] };
+type MegaMenu = {
+  name: string;
+  icon: typeof Gem;
+  route?: string;
+  columns: MegaColumn[];
+};
+
+const MEGA_MENUS: MegaMenu[] = [
+  {
+    name: 'Tiles',
+    icon: Grid3X3,
+    route: '/category/tiles',
+    columns: [
+      {
+        title: 'Tiles By',
+        items: [
+          'Floor Tiles', 'Wall Tiles', 'Bathroom Tiles', 'Kitchen Tiles',
+          'Living Room Tiles', 'Outdoor Tiles', 'Parking Tiles', 'Bedroom Tiles',
+          'Elevation Tiles', 'Balcony Tiles', 'Stair Tiles', 'Pooja Room Tiles',
+        ],
+      },
+      {
+        title: 'Tiles Finish',
+        items: [
+          'Anti Skid Tiles', 'Glossy Tiles', 'Polished Tiles', 'Matt Tiles',
+          'Carving Tiles', 'Metallic Tiles', 'Rustic Tiles', 'Lappato Tiles',
+          'Satin Tiles', 'Hi-Gloss Tiles', 'Wall Panels', 'Fluted Panels',
+        ],
+      },
+      {
+        title: 'Tiles Design',
+        items: [
+          '3D Tiles', 'Wooden Tiles', 'Marble Tiles', 'Texture Tiles',
+          'Mosaic Tiles', 'Granite Tiles', 'Stone Tiles', 'Pattern Tiles',
+          'Geometric Tiles', 'Cement Tiles', 'Travertine Tiles', 'Terrazzo Tiles',
+        ],
+      },
+      {
+        title: 'Tiles Type',
+        items: [
+          'Vitrified Tiles', 'Ceramic Tiles', 'Porcelain Tiles', 'Designer Tiles',
+          'Digital Tiles', 'Glazed Tiles', 'Cool Tiles', 'Printed Tiles',
+          'Nano Tiles', 'Imported Tiles', 'Italian Tiles', 'Spanish Tiles',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Living Room',
+    icon: Layers,
+    route: '/products?category=Living Room',
+    columns: [
+      {
+        title: 'Living Room Tiles',
+        items: [
+          'Large Format Tiles', 'Wooden Finish Tiles', 'Marble Look Tiles',
+          'Glossy Floor Tiles', 'Matt Floor Tiles', 'Anti Skid Tiles',
+        ],
+      },
+      {
+        title: 'Living Room Walls',
+        items: [
+          '3D Wall Tiles', 'Wall Panels', 'Fluted Panels',
+          'Texture Tiles', 'Highlighters', 'Mosaic Tiles',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Outdoor',
+    icon: Square,
+    route: '/products?category=Outdoor',
+    columns: [
+      {
+        title: 'Outdoor Tiles',
+        items: [
+          'Parking Tiles', 'Anti Skid Tiles', 'Rustic Tiles',
+          'Cement Tiles', 'Stone Look Tiles', 'Terrace Tiles',
+        ],
+      },
+      {
+        title: 'Outdoor Flooring',
+        items: [
+          'Vitrified Parking Tiles', 'Granite Flooring', 'Natural Stone',
+          'Paver Blocks', 'Kerbstones', 'Cobblestones',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Parking',
+    icon: Warehouse,
+    route: '/products?category=Parking',
+    columns: [
+      {
+        title: 'Parking Tiles',
+        items: [
+          'Anti Skid Parking Tiles', 'Heavy Duty Tiles', 'Vitrified Parking Tiles',
+          'Full Body Vitrified', 'Rustic Parking Tiles', 'Cement Parking Tiles',
+        ],
+      },
+      {
+        title: 'Parking Accessories',
+        items: [
+          'Car Parking Tiles', 'Paver Blocks', 'Kerbstones',
+          'Driveway Tiles', 'Outdoor Steps', 'Threshold Tiles',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Ceramic',
+    icon: Sparkles,
+    route: '/products?category=Ceramic',
+    columns: [
+      {
+        title: 'Ceramic Tiles',
+        items: [
+          'Ceramic Wall Tiles', 'Ceramic Floor Tiles', 'Ceramic Bathroom Tiles',
+          'Ceramic Kitchen Tiles', 'Glazed Ceramic Tiles', 'Digital Ceramic Tiles',
+        ],
+      },
+      {
+        title: 'Ceramic Sanitaryware',
+        items: [
+          'Wash Basin', 'Counter Basin', 'Wall Hung Basin',
+          'Pedestal Basin', 'Table Top Basin', 'Vanity Basin',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Vitrified',
+    icon: Gem,
+    route: '/products?category=Vitrified',
+    columns: [
+      {
+        title: 'Vitrified Tiles',
+        items: [
+          'Double Charge Vitrified', 'Full Body Vitrified', 'Glazed Vitrified Tiles',
+          'Polished Vitrified', 'Matt Vitrified', 'Rustic Vitrified',
+        ],
+      },
+      {
+        title: 'Vitrified Slabs',
+        items: [
+          '800x800 Vitrified', '600x1200 Vitrified', '800x1600 Vitrified',
+          '1200x1200 Vitrified', '1200x2400 Vitrified', 'Large Format Slabs',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Wash Basin',
+    icon: Bath,
+    route: '/products?category=Wash Basin',
+    columns: [
+      {
+        title: 'Wash Basin',
+        items: [
+          'Wall Hung Basin', 'Counter Basin', 'Pedestal Basin',
+          'Table Top Basin', 'Vanity Basin', 'Corner Basin',
+        ],
+      },
+      {
+        title: 'Basin Accessories',
+        items: [
+          'Basin Faucet', 'Basin Mirror', 'Basin Cabinet',
+          'Waste Coupling', 'Bottle Trap', 'Angle Valve',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Kitchen Sink',
+    icon: UtensilsCrossed,
+    route: '/category/kitchen-sink',
+    columns: [
+      {
+        title: 'Kitchen Sink',
+        items: [
+          'Single Bowl Sink', 'Double Bowl Sink', 'Triple Bowl Sink',
+          'Quartz Sink', 'Stainless Steel Sink', 'Handmade Sink',
+        ],
+      },
+      {
+        title: 'Kitchen Accessories',
+        items: [
+          'Kitchen Faucet', 'Drain Board', 'Waste Coupling',
+          'Soap Dispenser', 'Chopping Board', 'Sink Strainer',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'Glass Blocks',
+    icon: ImageIcon,
+    route: '/products?category=Glass Blocks',
+    columns: [
+      {
+        title: 'Glass Blocks',
+        items: [
+          'Clear Glass Blocks', 'Textured Glass Blocks', 'Colored Glass Blocks',
+          'Wave Glass Blocks', 'Frosted Glass Blocks', 'Decorative Glass Blocks',
+        ],
+      },
+      {
+        title: 'Glass Applications',
+        items: [
+          'Bathroom Glass Blocks', 'Kitchen Glass Blocks', 'Partition Glass Blocks',
+          'Staircase Glass Blocks', 'Facade Glass Blocks', 'Wall Glass Blocks',
+        ],
+      },
+    ],
+  },
+  {
+    name: 'More',
+    icon: Building2,
+    route: '/products',
+    columns: [
+      {
+        title: 'Marble & Stone',
+        items: [
+          'Indian Marble', 'Imported Marble', 'White Marble',
+          'Granite', 'Marble Statues', 'Marble Mandir',
+        ],
+      },
+      {
+        title: 'Bathroom',
+        items: [
+          'Western Toilet', 'Indian Toilet', 'Bathroom Vanity',
+          'Shower', 'Faucet', 'Bathroom Mirror',
+        ],
+      },
+      {
+        title: 'Building Material',
+        items: [
+          'Wall Panels', 'Fluted Panels', 'Adhesives',
+          'Grouts', 'Waterproofing', 'Tile Cleaners',
+        ],
+      },
+    ],
+  },
 ];
 
-/* Extra items shown under "More" dropdown */
-const MORE_LINKS = [
-  'Indian Marble',
-  'Imported Marble',
-  'White Marble',
-  'Granite',
-  'Marble Statues',
-  'Marble Mandir',
-  'Bathroom Vanity',
-  'Western Toilet',
-  'Indian Toilet',
-  'Shower',
-  'Faucet',
-  'Wall Panels',
-  'Fluted Panels',
-  'Adhesives',
-  'Grouts',
-  'Waterproofing',
-  'Tile Cleaners',
-  'Porcelain Tiles',
-  'Italian Tiles',
-  'Spanish Tiles',
-];
-
+/* ============================================================
+   HEADER COMPONENT
+   ============================================================ */
 export function Header() {
   const { totalItems, setIsOpen } = useCart();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [activeMega, setActiveMega] = useState<string | null>(null);
+  const [openMobileMega, setOpenMobileMega] = useState<string | null>(null);
 
   /* Live clock */
   useEffect(() => {
@@ -70,7 +285,8 @@ export function Header() {
 
   const goTo = (path: string) => {
     setMobileMenuOpen(false);
-    setMoreOpen(false);
+    setActiveMega(null);
+    setOpenMobileMega(null);
     navigate(path);
   };
 
@@ -82,17 +298,16 @@ export function Header() {
     navigate(`/products?search=${encodeURIComponent(q)}`);
   };
 
-  const handleQuickLink = (label: string) => {
-    setMoreOpen(false);
+  const handleMegaItemClick = (label: string) => {
+    setActiveMega(null);
+    setOpenMobileMega(null);
     setMobileMenuOpen(false);
     navigate(`/products?category=${encodeURIComponent(label)}`);
   };
 
   return (
     <>
-      {/* =====================================================
-          LIVE INFO BAR — STICKY TOP
-      ====================================================== */}
+      {/* ==================== LIVE MARQUEE ==================== */}
       <div className="sticky top-0 z-[70] w-full bg-[#071522] text-white">
         <div className="w-full overflow-hidden border-b border-white/10 bg-[#0b1d2d]">
           <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
@@ -175,9 +390,7 @@ export function Header() {
         </div>
       </div>
 
-      {/* =====================================================
-          MAIN HEADER — STICKY BELOW LIVE BAR
-      ====================================================== */}
+      {/* ==================== MAIN HEADER ==================== */}
       <header className="sticky top-9 z-[65] w-full bg-[#071522] text-white shadow-2xl">
         <div className="w-full border-b border-white/10">
           <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
@@ -295,8 +508,6 @@ export function Header() {
 
               {/* RIGHT SIDE */}
               <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
-
-                {/* SEARCH */}
                 <form onSubmit={handleSearch} className="hidden md:block">
                   <div className="relative">
                     <input
@@ -311,7 +522,6 @@ export function Header() {
                   </div>
                 </form>
 
-                {/* WHATSAPP */}
                 <a
                   href={whatsappEnquiry('I have a general enquiry about your products.')}
                   target="_blank"
@@ -322,7 +532,6 @@ export function Header() {
                   <MessageCircle size={22} />
                 </a>
 
-                {/* CONTACT NUMBER */}
                 <a
                   href="tel:+919330300408"
                   className="hidden items-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-2 text-[12px] font-semibold text-white transition-all duration-300 hover:bg-black hover:text-[#ff9d17] lg:flex"
@@ -331,7 +540,6 @@ export function Header() {
                   <span>93303 00408</span>
                 </a>
 
-                {/* CART */}
                 <button
                   type="button"
                   onClick={() => setIsOpen(true)}
@@ -349,14 +557,131 @@ export function Header() {
             </div>
           </div>
         </div>
+      </header>
 
-        {/* =====================================================
-            MOBILE MENU
-        ====================================================== */}
-        {mobileMenuOpen && (
-          <div className="border-t border-white/10 bg-[#071522] lg:hidden">
+      {/* ==================== SECOND HEADER — MEGA MENU (DESKTOP) ==================== */}
+      <div
+        className="relative z-[60] hidden w-full border-b border-white/10 bg-[#17263b] text-white lg:block"
+        onMouseLeave={() => setActiveMega(null)}
+      >
+        <div className="mx-auto w-full max-w-[1600px] px-3 lg:px-7">
+          <div className="flex h-[58px] items-center justify-center gap-0.5">
+            {MEGA_MENUS.map((menu) => {
+              const Icon = menu.icon;
+              const isActive = activeMega === menu.name;
+              const colCount = menu.columns.length;
+              const gridCols = colCount === 4 ? 'grid-cols-4' : colCount === 3 ? 'grid-cols-3' : 'grid-cols-2';
+              const dropWidth = colCount === 4 ? 'w-[1100px]' : colCount === 3 ? 'w-[850px]' : 'w-[680px]';
 
-            {/* MOBILE SEARCH */}
+              return (
+                <div
+                  key={menu.name}
+                  className="relative h-full"
+                  onMouseEnter={() => setActiveMega(menu.name)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => menu.route && goTo(menu.route)}
+                    className={`group flex h-full items-center gap-1.5 px-3 text-xs font-bold transition-all duration-200 xl:px-4 xl:text-[13px] ${
+                      isActive
+                        ? 'bg-[#ff9d17] text-black'
+                        : 'text-white hover:bg-black hover:text-[#ff9d17]'
+                    }`}
+                  >
+                    <Icon size={16} />
+                    <span>{menu.name}</span>
+                    <ChevronDown size={13} className={`transition-transform duration-200 ${isActive ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* MEGA DROPDOWN — TEXT ONLY SUBCATEGORIES */}
+                  <div
+                    className={`absolute left-1/2 top-full z-[60] ${dropWidth} max-w-[96vw] -translate-x-1/2 rounded-b-2xl border border-stone-200 bg-white p-5 text-stone-900 shadow-2xl transition-all duration-200 ${
+                      isActive
+                        ? 'visible translate-y-0 opacity-100'
+                        : 'invisible -translate-y-2 opacity-0 pointer-events-none'
+                    }`}
+                  >
+                    <div className="mb-4 flex items-center justify-between border-b border-stone-200 pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#ff9d17]/15 text-[#ff9d17]">
+                          <Icon size={18} />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-extrabold">{menu.name}</h3>
+                          <p className="text-xs text-stone-500">
+                            Explore our {menu.name.toLowerCase()} collection
+                          </p>
+                        </div>
+                      </div>
+                      {menu.route && (
+                        <button
+                          type="button"
+                          onClick={() => goTo(menu.route!)}
+                          className="rounded-lg bg-stone-900 px-4 py-2 text-xs font-bold text-white transition hover:bg-[#ff9d17] hover:text-black"
+                        >
+                          View All →
+                        </button>
+                      )}
+                    </div>
+
+                    <div className={`grid gap-5 ${gridCols}`}>
+                      {menu.columns.map((col) => (
+                        <div key={col.title} className="min-w-0">
+                          <div className="mb-3 flex items-center gap-2 border-b border-stone-200 pb-2">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-stone-100">
+                              <Grid3X3 size={12} />
+                            </div>
+                            <h4 className="text-xs font-extrabold uppercase tracking-wider text-stone-700">
+                              {col.title}
+                            </h4>
+                          </div>
+
+                          <ul className="space-y-0.5">
+                            {col.items.map((item) => (
+                              <li key={item}>
+                                <button
+                                  type="button"
+                                  onClick={() => handleMegaItemClick(item)}
+                                  className="group flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-[12.5px] font-medium text-stone-600 transition-colors hover:bg-[#ff9d17]/10 hover:text-[#ff9d17]"
+                                >
+                                  <ChevronRight
+                                    size={12}
+                                    className="shrink-0 text-stone-300 group-hover:text-[#ff9d17]"
+                                  />
+                                  <span className="truncate">{item}</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* ==================== MOBILE MENU DRAWER ==================== */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[90] lg:hidden">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+          <div className="absolute right-0 top-0 h-full w-[88%] max-w-md overflow-y-auto bg-[#071522] text-white shadow-2xl">
+
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-[#071522] px-4 py-3">
+              <span className="text-sm font-extrabold tracking-wider text-[#ff9d17]">MENU</span>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-white/10"
+                aria-label="Close menu"
+              >
+                <X size={22} />
+              </button>
+            </div>
+
+            {/* Search */}
             <form onSubmit={handleSearch} className="border-b border-white/10 p-4">
               <div className="relative">
                 <input
@@ -367,114 +692,132 @@ export function Header() {
                   className="h-11 w-full rounded-lg border border-[#20364e] bg-[#14263a] pl-10 pr-12 text-sm text-white outline-none placeholder:text-slate-400 focus:border-[#ff9d17] focus:ring-1 focus:ring-[#ff9d17]"
                 />
                 <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <button
-                  type="submit"
-                  className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-r-lg bg-[#ff9d17] text-black transition hover:bg-orange-500"
-                >
+                <button type="submit" className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center rounded-r-lg bg-[#ff9d17] text-black transition hover:bg-orange-500">
                   <Search size={18} />
                 </button>
               </div>
             </form>
 
-            {/* MOBILE LINKS */}
+            {/* Quick links */}
             <div className="py-2">
-              <button
-                type="button"
-                onClick={() => goTo('/')}
-                className="flex w-full items-center gap-3 px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <Home size={19} />
-                Home
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/products')}
-                className="flex w-full items-center gap-3 bg-black px-5 py-3.5 text-left font-semibold text-white transition hover:bg-[#ff9d17] hover:text-black"
-              >
-                All Products
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/category/marble-statues')}
-                className="flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <span>Marble Statues</span>
-                <ChevronRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/category/tiles')}
-                className="flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <span>Tiles</span>
-                <ChevronRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/category/sanitaryware')}
-                className="flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <span>Sanitaryware</span>
-                <ChevronRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/category/kitchen-sink')}
-                className="flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <span>Kitchen Sink</span>
-                <ChevronRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/category/bathroom-vanity')}
-                className="flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <span>Bathroom Vanity</span>
-                <ChevronRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => goTo('/blog')}
-                className="flex w-full items-center gap-3 px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                Blog
-              </button>
-
+              {[
+                { label: 'Home',         path: '/',                       icon: Home },
+                { label: 'All Products', path: '/products',               icon: null, primary: true },
+                { label: 'Marble Statues', path: '/category/marble-statues', icon: null },
+                { label: 'Tiles',        path: '/category/tiles',         icon: null },
+                { label: 'Sanitaryware', path: '/category/sanitaryware',  icon: null },
+                { label: 'Kitchen Sink', path: '/category/kitchen-sink',  icon: null },
+                { label: 'Bathroom Vanity', path: '/category/bathroom-vanity', icon: null },
+                { label: 'Blog',         path: '/blog',                   icon: null },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => goTo(item.path)}
+                    className={`flex w-full items-center gap-3 px-5 py-3.5 text-left font-semibold transition ${
+                      item.primary
+                        ? 'bg-black text-white hover:bg-[#ff9d17] hover:text-black'
+                        : 'hover:bg-black hover:text-[#ff9d17]'
+                    }`}
+                  >
+                    {Icon && <Icon size={18} />}
+                    {item.label}
+                  </button>
+                );
+              })}
               <button
                 type="button"
                 onClick={() => goTo('/calculator')}
                 className="flex w-full items-center gap-3 px-5 py-3.5 text-left font-semibold transition hover:bg-black hover:text-[#ff9d17]"
               >
-                <Calculator size={19} />
+                <Calculator size={18} />
                 Calculator
               </button>
+            </div>
 
-              <a
-                href="tel:+919330300408"
-                className="flex items-center gap-3 px-5 py-3.5 font-semibold transition hover:bg-black hover:text-[#ff9d17]"
-              >
-                <Phone size={19} className="text-[#ff9d17]" />
+            {/* Mega accordion — subcategories text-only */}
+            <div className="border-t border-white/10">
+              <div className="px-5 py-3 text-[11px] font-extrabold uppercase tracking-widest text-[#ff9d17]">
+                Shop by Category
+              </div>
+
+              {MEGA_MENUS.map((menu) => {
+                const Icon = menu.icon;
+                const open = openMobileMega === menu.name;
+                return (
+                  <div key={menu.name} className="border-b border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => setOpenMobileMega(open ? null : menu.name)}
+                      className={`flex w-full items-center justify-between px-5 py-3.5 text-left font-semibold transition ${
+                        open ? 'bg-black text-[#ff9d17]' : 'hover:bg-black hover:text-[#ff9d17]'
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <Icon size={18} />
+                        {menu.name}
+                      </span>
+                      <ChevronDown size={16} className={`transition-transform ${open ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {open && (
+                      <div className="bg-[#0b1d2d] px-4 py-3">
+                        {menu.route && (
+                          <button
+                            type="button"
+                            onClick={() => goTo(menu.route!)}
+                            className="mb-3 w-full rounded-lg bg-[#ff9d17] px-3 py-2 text-xs font-extrabold text-black"
+                          >
+                            View All {menu.name} →
+                          </button>
+                        )}
+                        <div className="space-y-4">
+                          {menu.columns.map((col) => (
+                            <div key={col.title}>
+                              <h4 className="mb-2 text-[10px] font-extrabold uppercase tracking-widest text-[#ff9d17]">
+                                {col.title}
+                              </h4>
+                              <ul className="space-y-0.5">
+                                {col.items.map((item) => (
+                                  <li key={item}>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleMegaItemClick(item)}
+                                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[12px] font-medium text-white/85 transition hover:bg-white/5 hover:text-[#ff9d17]"
+                                    >
+                                      <ChevronRight size={12} className="shrink-0 text-[#ff9d17]" />
+                                      <span>{item}</span>
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer actions */}
+            <div className="border-t border-white/10 py-2">
+              <a href="tel:+919330300408" className="flex items-center gap-3 px-5 py-3.5 font-semibold transition hover:bg-black hover:text-[#ff9d17]">
+                <Phone size={18} className="text-[#ff9d17]" />
                 +91 93303 00408
               </a>
-
               <a
                 href={whatsappEnquiry('I have a general enquiry about your products.')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 px-5 py-3.5 font-semibold text-green-400 transition hover:bg-black"
               >
-                <MessageCircle size={19} />
+                <MessageCircle size={18} />
                 WhatsApp Enquiry
               </a>
-
               <button
                 type="button"
                 onClick={() => { setIsOpen(true); setMobileMenuOpen(false); }}
@@ -492,82 +835,8 @@ export function Header() {
               </button>
             </div>
           </div>
-        )}
-      </header>
-
-      {/* =====================================================
-          SECOND CATEGORY NAVBAR — QUICK LINKS (DESKTOP)
-      ====================================================== */}
-      <div className="relative z-[60] hidden w-full bg-[#071522] text-white lg:block">
-        <div className="w-full border-t border-white/5">
-          <div className="mx-auto w-full max-w-[1600px] px-4 lg:px-7">
-            <div className="flex h-[64px] items-center justify-center gap-1 overflow-visible whitespace-nowrap bg-[#17263b]">
-
-              {QUICK_LINKS.map((label) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => handleQuickLink(label)}
-                  className="group flex h-full shrink-0 items-center px-3 text-xs font-bold text-white transition-all duration-300 hover:bg-black hover:text-[#ff9d17] xl:px-4 xl:text-sm"
-                >
-                  <span className="transition-transform duration-300 group-hover:-translate-y-0.5">
-                    {label}
-                  </span>
-                </button>
-              ))}
-
-              {/* MORE DROPDOWN */}
-              <div
-                className="relative h-full"
-                onMouseEnter={() => setMoreOpen(true)}
-                onMouseLeave={() => setMoreOpen(false)}
-              >
-                <button
-                  type="button"
-                  onClick={() => setMoreOpen((p) => !p)}
-                  className={`group flex h-full shrink-0 items-center gap-1 px-3 text-xs font-bold text-white transition-all duration-300 xl:px-4 xl:text-sm ${
-                    moreOpen
-                      ? 'bg-[#ff9d17] text-black'
-                      : 'hover:bg-black hover:text-[#ff9d17]'
-                  }`}
-                >
-                  <span>More</span>
-                  <ChevronDown
-                    size={15}
-                    className={`transition-transform duration-300 ${moreOpen ? 'rotate-180' : ''}`}
-                  />
-                </button>
-
-                {moreOpen && (
-                  <div className="absolute right-0 top-full z-[70] w-[640px] max-w-[96vw] rounded-b-2xl border border-stone-200 bg-white p-5 text-stone-900 shadow-2xl">
-                    <div className="mb-3 border-b border-stone-200 pb-2">
-                      <h3 className="text-sm font-extrabold uppercase tracking-wider text-stone-700">
-                        More Categories
-                      </h3>
-                    </div>
-                    <div className="grid grid-cols-3 gap-x-4 gap-y-1">
-                      {MORE_LINKS.map((label) => (
-                        <button
-                          key={label}
-                          type="button"
-                          onClick={() => handleQuickLink(label)}
-                          className="group flex items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-[12.5px] font-medium text-stone-600 transition-colors hover:bg-[#ff9d17]/10 hover:text-[#ff9d17]"
-                        >
-                          <ChevronRight
-                            size={12}
-                            className="shrink-0 text-stone-300 group-hover:text-[#ff9d17]"
-                          />
-                          <span className="truncate">{label}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
