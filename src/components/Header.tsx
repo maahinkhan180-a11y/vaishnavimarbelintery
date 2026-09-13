@@ -93,37 +93,51 @@ export function Header() {
                 |
               </span>
 
-              <span className="text-orange-300">
-                Kajaria
+              {/* TRUSTED BRANDS */}
+              <span className="text-orange-300">Kajaria</span>
+              <span className="text-white/30">•</span>
+              <span className="text-green-300">Johnson</span>
+              <span className="text-white/30">•</span>
+              <span className="text-sky-300">Jaquar</span>
+              <span className="text-white/30">•</span>
+              <span className="text-violet-300">Fortiva</span>
+              <span className="text-white/30">•</span>
+              <span className="text-emerald-300">Somany</span>
+              <span className="text-white/30">•</span>
+              <span className="text-cyan-300">Vitero</span>
+              <span className="text-white/30">•</span>
+              <span className="text-pink-300">Sika</span>
+              <span className="text-white/30">•</span>
+              <span className="text-yellow-300">Hindware</span>
+              <span className="text-white/30">•</span>
+              <span className="text-rose-300">Parryware</span>
+              <span className="text-white/30">•</span>
+              <span className="text-amber-300">Varmora</span>
+              <span className="text-white/30">•</span>
+              <span className="text-blue-300">ROOF</span>
+              <span className="text-white/30">•</span>
+              <span className="text-lime-300">Nitco</span>
+              <span className="text-white/30">•</span>
+              <span className="text-purple-300">CERO</span>
+              <span className="text-white/30">•</span>
+              <span className="text-orange-300">Lemovia</span>
+              <span className="text-white/30">•</span>
+              <span className="text-fuchsia-300">Wonder Ceramic</span>
+
+              <span className="mx-2 text-white/20">|</span>
+
+              {/* BAJAJ FINSERV EMI */}
+              <span className="font-extrabold text-[#ff9d17]">
+                Bajaj Finserv
               </span>
 
               <span className="text-white/30">•</span>
 
-              <span className="text-green-300">
-                Somany
+              <span className="font-bold text-green-400">
+                0 Down Payment*
               </span>
 
               <span className="text-white/30">•</span>
-
-              <span className="text-sky-300">
-                Orientbell
-              </span>
-
-              <span className="text-white/30">•</span>
-
-              <span className="text-violet-300">
-                CERA
-              </span>
-
-              <span className="text-white/30">•</span>
-
-              <span className="text-rose-300">
-                Jaquar
-              </span>
-
-              <span className="mx-2 text-white/20">
-                |
-              </span>
 
               <span className="font-bold text-amber-300">
                 Easy EMI Available
@@ -131,20 +145,14 @@ export function Header() {
 
               <span className="text-white/30">•</span>
 
-              <span className="text-green-400">
-                UPI
+              <span className="text-purple-300">
+                Flexible EMI Options
               </span>
 
               <span className="text-white/30">•</span>
 
               <span className="text-cyan-300">
-                Card
-              </span>
-
-              <span className="text-white/30">•</span>
-
-              <span className="text-purple-300">
-                Bank EMI
+                UPI / Card / Bank EMI
               </span>
 
               <span className="mx-2 text-white/20">
@@ -206,6 +214,12 @@ export function Header() {
 
               <span className="text-cyan-300">
                 Flexible Payment Options
+              </span>
+
+              <span className="text-white/30">•</span>
+
+              <span className="text-white/50">
+                *Subject to eligibility &amp; applicable terms
               </span>
 
             </div>
