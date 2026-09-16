@@ -372,9 +372,9 @@ ${form.message}
                       VAISHNAVI MARBLE
                  </h2>
 
-                <p className="text-xs text-white">
-                  Tiles • Marble • Interiors
-                </p>
+               <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.28em] text-white">
+                    Tiles • Marble • Interiors
+               </div>
               </div>
 
             </div>
