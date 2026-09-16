@@ -1,268 +1,277 @@
 import { useEffect, useState } from 'react';
-import { X, Send, CheckCircle, User, Phone, Mail, MessageSquare } from 'lucide-react';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { X, MessageCircle } from 'lucide-react';
+
+const WHATSAPP_NUMBER = '917003948297';
 
 export function EnquiryPopup() {
   const [isOpen, setIsOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
-    phone: '',
+    mobile: '',
     email: '',
-    requirement: '',
+    interestedIn: '',
+    message: '',
   });
 
   useEffect(() => {
-    // Show popup when website opens
-    const timer = window.setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 700);
+    }, 1000);
 
-    return () => window.clearTimeout(timer);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.name.trim() || !form.phone.trim()) {
-      alert('Please enter your name and mobile number.');
+    if (!form.name.trim() || !form.mobile.trim()) {
       return;
     }
 
-    if (!isSupabaseConfigured) {
-      alert('Database is not connected.');
-      return;
-    }
+    const message = `
+Hello Vaishnavi Marble,
 
-    setLoading(true);
+I would like to make an enquiry.
 
-    try {
-      const { error } = await supabase.from('inquiries').insert([
-        {
-          name: form.name.trim(),
-          phone: form.phone.trim(),
-          email: form.email.trim() || null,
-          requirement: form.requirement.trim() || null,
-        },
-      ]);
+Name: ${form.name}
+Mobile: ${form.mobile}
+Email: ${form.email || 'Not provided'}
+Interested In: ${form.interestedIn || 'Not specified'}
+Message: ${form.message || 'No message'}
 
-      if (error) {
-        console.error('Enquiry error:', error);
-        alert('Unable to submit enquiry. Please try again.');
-        return;
-      }
+Thank you.
+    `.trim();
 
-      setSubmitted(true);
-      localStorage.setItem('vaishnavimarble_enquiry_submitted', 'true');
-    } catch (error) {
-      console.error(error);
-      alert('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+      message
+    )}`;
+
+    setSubmitted(true);
+
+    window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+
+    setTimeout(() => {
+      setIsOpen(false);
+      setSubmitted(false);
+
+      setForm({
+        name: '',
+        mobile: '',
+        email: '',
+        interestedIn: '',
+        message: '',
+      });
+    }, 1500);
   };
 
-  const closePopup = () => {
-    setIsOpen(false);
-  };
-
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 px-4 py-6 backdrop-blur-sm"
-      onClick={closePopup}
-    >
-      <div
-        className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Close button */}
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 px-4 py-6 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl">
+
+        {/* Close Button */}
         <button
           type="button"
-          onClick={closePopup}
-          className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-stone-700 shadow-md transition hover:bg-stone-100"
-          aria-label="Close enquiry popup"
+          onClick={() => setIsOpen(false)}
+          className="absolute right-4 top-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-md transition hover:bg-gray-100 hover:text-black"
+          aria-label="Close enquiry form"
         >
           <X size={20} />
         </button>
 
         {/* Header */}
-        <div className="bg-black px-6 py-7 text-white sm:px-8">
-          <div className="pr-8">
-            <p className="mb-1 text-sm font-medium uppercase tracking-wider text-[#ff9d17]">
-              Vaishnavi Marble
-            </p>
+        <div className="bg-stone-900 px-6 py-6 pr-16 text-white">
+          <div className="mb-2 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-500">
+              <MessageCircle size={23} />
+            </div>
 
-            <h2 className="text-2xl font-bold sm:text-3xl">
-              Send Your Enquiry
-            </h2>
+            <div>
+              <h2 className="text-xl font-semibold">
+                Enquire Now
+              </h2>
 
-            <p className="mt-2 text-sm leading-relaxed text-stone-300">
-              Looking for tiles, marble, granite or sanitaryware?
-              Tell us what you need and our team will contact you.
-            </p>
+              <p className="text-sm text-stone-300">
+                Get in touch with Vaishnavi Marble
+              </p>
+            </div>
           </div>
+
+          <p className="mt-3 text-sm text-stone-300">
+            Fill in your details and send your enquiry directly on WhatsApp.
+          </p>
         </div>
 
-        {submitted ? (
-          <div className="px-6 py-12 text-center sm:px-8">
-            <CheckCircle
-              size={58}
-              className="mx-auto mb-4 text-green-600"
-            />
-
-            <h3 className="text-2xl font-bold text-stone-900">
-              Enquiry Received!
-            </h3>
-
-            <p className="mt-2 text-sm leading-relaxed text-stone-600">
-              Thank you for contacting Vaishnavi Marble.
-              Our team will contact you shortly.
-            </p>
-
-            <button
-              type="button"
-              onClick={closePopup}
-              className="mt-6 rounded-lg bg-black px-6 py-3 font-semibold text-white transition hover:bg-[#ff9d17] hover:text-black"
-            >
-              Close
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 px-6 py-6 sm:px-8">
+        {/* Form */}
+        {!submitted ? (
+          <form
+            onSubmit={handleSubmit}
+            className="max-h-[75vh] overflow-y-auto px-6 py-6"
+          >
             {/* Name */}
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-800">
+            <div className="mb-4">
+              <label
+                htmlFor="enquiry-name"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
                 Name <span className="text-red-500">*</span>
               </label>
 
-              <div className="relative">
-                <User
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
-                />
-
-                <input
-                  type="text"
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Enter your name"
-                  autoComplete="name"
-                  required
-                  className="w-full rounded-lg border border-stone-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-[#ff9d17] focus:ring-2 focus:ring-[#ff9d17]/20"
-                />
-              </div>
+              <input
+                id="enquiry-name"
+                type="text"
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter your name"
+                required
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-stone-700 focus:ring-2 focus:ring-stone-200"
+              />
             </div>
 
-            {/* Phone */}
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-800">
+            {/* Mobile */}
+            <div className="mb-4">
+              <label
+                htmlFor="enquiry-mobile"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
                 Mobile Number <span className="text-red-500">*</span>
               </label>
 
-              <div className="relative">
-                <Phone
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
-                />
-
-                <input
-                  type="tel"
-                  name="phone"
-                  value={form.phone}
-                  onChange={handleChange}
-                  placeholder="Enter mobile number"
-                  autoComplete="tel"
-                  inputMode="numeric"
-                  required
-                  className="w-full rounded-lg border border-stone-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-[#ff9d17] focus:ring-2 focus:ring-[#ff9d17]/20"
-                />
-              </div>
+              <input
+                id="enquiry-mobile"
+                type="tel"
+                name="mobile"
+                value={form.mobile}
+                onChange={handleChange}
+                placeholder="Enter your mobile number"
+                required
+                pattern="[0-9+\-\s]{10,15}"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-stone-700 focus:ring-2 focus:ring-stone-200"
+              />
             </div>
 
             {/* Email */}
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-800">
-                Email <span className="text-stone-400">(Optional)</span>
+            <div className="mb-4">
+              <label
+                htmlFor="enquiry-email"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
+                Email
               </label>
 
-              <div className="relative">
-                <Mail
-                  size={18}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
-                />
-
-                <input
-                  type="email"
-                  name="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="Enter email address"
-                  autoComplete="email"
-                  className="w-full rounded-lg border border-stone-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-[#ff9d17] focus:ring-2 focus:ring-[#ff9d17]/20"
-                />
-              </div>
+              <input
+                id="enquiry-email"
+                type="email"
+                name="email"
+                value={form.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-stone-700 focus:ring-2 focus:ring-stone-200"
+              />
             </div>
 
-            {/* Requirement */}
-            <div>
-              <label className="mb-1.5 block text-sm font-semibold text-stone-800">
-                Your Requirement
+            {/* Interested In */}
+            <div className="mb-4">
+              <label
+                htmlFor="enquiry-interest"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
+                Interested In
               </label>
 
-              <div className="relative">
-                <MessageSquare
-                  size={18}
-                  className="absolute left-3 top-3 text-stone-400"
-                />
+              <select
+                id="enquiry-interest"
+                name="interestedIn"
+                value={form.interestedIn}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-stone-700 focus:ring-2 focus:ring-stone-200"
+              >
+                <option value="">Select a product</option>
+                <option value="Marble">Marble</option>
+                <option value="Granite">Granite</option>
+                <option value="Tiles">Tiles</option>
+                <option value="Sanitaryware">Sanitaryware</option>
+                <option value="Kitchen Sink">Kitchen Sink</option>
+                <option value="Vanity">Vanity</option>
+                <option value="Parking Tiles">Parking Tiles</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-                <textarea
-                  name="requirement"
-                  value={form.requirement}
-                  onChange={handleChange}
-                  placeholder="Example: 500 sq.ft. floor tiles"
-                  rows={3}
-                  className="w-full resize-none rounded-lg border border-stone-300 py-3 pl-10 pr-3 text-sm outline-none transition focus:border-[#ff9d17] focus:ring-2 focus:ring-[#ff9d17]/20"
-                />
-              </div>
+            {/* Message */}
+            <div className="mb-5">
+              <label
+                htmlFor="enquiry-message"
+                className="mb-1.5 block text-sm font-medium text-gray-700"
+              >
+                Message
+              </label>
+
+              <textarea
+                id="enquiry-message"
+                name="message"
+                value={form.message}
+                onChange={handleChange}
+                placeholder="Tell us what you need..."
+                rows={3}
+                className="w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-stone-700 focus:ring-2 focus:ring-stone-200"
+              />
             </div>
 
             {/* Submit */}
             <button
               type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-black px-5 py-3.5 font-semibold text-white transition hover:bg-[#ff9d17] hover:text-black disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3.5 font-semibold text-white shadow-md transition hover:bg-green-700 active:scale-[0.98]"
             >
-              {loading ? (
-                'Submitting...'
-              ) : (
-                <>
-                  <Send size={18} />
-                  Submit Enquiry
-                </>
-              )}
+              <MessageCircle size={20} />
+              Submit Enquiry on WhatsApp
             </button>
 
-            <p className="text-center text-xs text-stone-500">
-              Your information will be used only to contact you regarding
-              your enquiry.
+            <p className="mt-3 text-center text-xs text-gray-500">
+              Your enquiry will open in WhatsApp for you to send.
             </p>
           </form>
+        ) : (
+          /* Success */
+          <div className="px-6 py-12 text-center">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+              <MessageCircle
+                size={32}
+                className="text-green-600"
+              />
+            </div>
+
+            <h3 className="text-xl font-semibold text-gray-900">
+              WhatsApp Opened
+            </h3>
+
+            <p className="mt-2 text-sm text-gray-600">
+              Your enquiry message is ready in WhatsApp.
+              Please press Send to submit it.
+            </p>
+          </div>
         )}
       </div>
     </div>
   );
 }
+
