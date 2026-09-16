@@ -367,15 +367,13 @@ ${form.message}
               />
 
               <div>
-                <h2 className="text-white font-bold text-xl tracking-wide">
-                  VAISHNAVI{' '}
-                  <span className="text-[#ff9d17]">
-                    MARBLE
-                  </span>
-                </h2>
+                
+                <h2 className="text-[#ff9d17] font-bold text-xl tracking-wide">
+                      VAISHNAVI MARBLE
+                 </h2>
 
                 <p className="text-xs text-slate-500">
-                  Premium Marble & Surface Solutions
+                  Tiles • Marble • Interiors
                 </p>
               </div>
 
