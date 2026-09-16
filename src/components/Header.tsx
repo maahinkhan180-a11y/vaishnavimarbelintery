@@ -423,7 +423,7 @@ export function Header() {
                   <div className="whitespace-nowrap text-[18px] font-extrabold leading-none tracking-wide text-[#ff9d17]">
                     VAISHNAVI <span className="text-[#ff9d17]">MARBLE</span>
                   </div>
-                  <div className="mt-1 text-[9px] font-medium uppercase tracking-[0.28em] text-white/50">
+                  <div className="mt-1 text-[14px] font-medium uppercase tracking-[0.28em] text-white">
                     Tiles • Marble • Interiors
                   </div>
                 </div>
