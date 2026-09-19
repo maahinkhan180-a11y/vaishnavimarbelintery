@@ -10,16 +10,20 @@ import {
   ShieldCheck,
   Headphones,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { supabase } from "@/lib/supabase";
-import { useNavigate } from "react-router-dom";
 import type { Category, Product } from "@/types";
 import ProductCard from "@/components/ProductCard";
 import { whatsappEnquiry } from "@/lib/whatsapp";
 
+/* =========================================================
+   HERO SLIDES
+========================================================= */
+
 const HERO_SLIDES = [
   {
-    isFullBanner: true,
+    type: "emi",
     image: "/EMI_OFFER.png",
     title: "",
     subtitle: "",
@@ -27,7 +31,7 @@ const HERO_SLIDES = [
     link: "",
   },
   {
-    isFullBanner: false,
+    type: "normal",
     image:
       "https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "Premium Marble & Tiles",
@@ -37,7 +41,7 @@ const HERO_SLIDES = [
     link: "/category/marble-statues",
   },
   {
-    isFullBanner: false,
+    type: "normal",
     image:
       "https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "Designer Kitchen & Bath Tiles",
@@ -47,7 +51,7 @@ const HERO_SLIDES = [
     link: "/category/tiles",
   },
   {
-    isFullBanner: false,
+    type: "normal",
     image:
       "https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "Marble, Granite & Sanitaryware",
@@ -57,7 +61,7 @@ const HERO_SLIDES = [
     link: "/category/marble-granite",
   },
   {
-    isFullBanner: false,
+    type: "normal",
     image:
       "https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg?auto=compress&cs=tinysrgb&w=1600",
     title: "Marble Statues & Mandirs",
@@ -67,6 +71,10 @@ const HERO_SLIDES = [
     link: "/category/marble-statues",
   },
 ];
+
+/* =========================================================
+   TRUST ITEMS
+========================================================= */
 
 const TRUST_ITEMS = [
   {
@@ -91,6 +99,10 @@ const TRUST_ITEMS = [
   },
 ];
 
+/* =========================================================
+   HOMEPAGE
+========================================================= */
+
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -99,56 +111,89 @@ export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /*
-   * Load categories and featured products
-   */
+  /* =======================================================
+     LOAD SUPABASE DATA
+  ======================================================= */
+
   useEffect(() => {
+    let mounted = true;
+
     const loadData = async () => {
       try {
-        const [categoryResult, productResult] = await Promise.all([
-          supabase
-            .from("categories")
-            .select("*")
-            .order("name", { ascending: true }),
+        const [categoriesResponse, productsResponse] =
+          await Promise.all([
+            supabase
+              .from("categories")
+              .select("*")
+              .order("name", { ascending: true }),
 
-          supabase
-            .from("products")
-            .select("*")
-            .eq("featured", true)
-            .limit(8),
-        ]);
+            supabase
+              .from("products")
+              .select("*")
+              .eq("featured", true)
+              .limit(8),
+          ]);
 
-        if (!categoryResult.error && categoryResult.data) {
-          setCategories(categoryResult.data);
+        if (!mounted) return;
+
+        if (categoriesResponse.error) {
+          console.error(
+            "Categories error:",
+            categoriesResponse.error
+          );
+        } else {
+          setCategories(
+            (categoriesResponse.data || []) as Category[]
+          );
         }
 
-        if (!productResult.error && productResult.data) {
-          setFeaturedProducts(productResult.data);
+        if (productsResponse.error) {
+          console.error(
+            "Products error:",
+            productsResponse.error
+          );
+        } else {
+          setFeaturedProducts(
+            (productsResponse.data || []) as Product[]
+          );
         }
       } catch (error) {
-        console.error("Homepage data loading error:", error);
+        console.error("Homepage loading error:", error);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadData();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  /*
-   * Auto slide change - 10 seconds
-   */
+  /* =======================================================
+     AUTO SLIDE - EVERY 10 SECONDS
+  ======================================================= */
+
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+      setCurrentSlide(
+        (previous) =>
+          (previous + 1) % HERO_SLIDES.length
+      );
     }, 10000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
-  /*
-   * Preload hero images
-   */
+  /* =======================================================
+     PRELOAD HERO IMAGES
+  ======================================================= */
+
   useEffect(() => {
     HERO_SLIDES.forEach((slide) => {
       const image = new Image();
@@ -156,15 +201,28 @@ export default function HomePage() {
     });
   }, []);
 
-  const goToNextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
-  }, []);
+  /* =======================================================
+     SLIDER CONTROLS
+  ======================================================= */
 
-  const goToPreviousSlide = useCallback(() => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide(
-      (prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length
+      (previous) =>
+        (previous + 1) % HERO_SLIDES.length
     );
   }, []);
+
+  const previousSlide = useCallback(() => {
+    setCurrentSlide(
+      (previous) =>
+        (previous - 1 + HERO_SLIDES.length) %
+        HERO_SLIDES.length
+    );
+  }, []);
+
+  /* =======================================================
+     WHATSAPP
+  ======================================================= */
 
   const handleWhatsApp = () => {
     whatsappEnquiry(
@@ -173,32 +231,35 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white">
 
-      {/* =========================================================
+      {/* =====================================================
           HERO CAROUSEL
-      ========================================================= */}
+      ===================================================== */}
+
       <section className="relative w-full h-[280px] sm:h-[330px] md:h-[400px] lg:h-[460px] overflow-hidden bg-white">
 
         {HERO_SLIDES.map((slide, index) => {
-          const isActive = index === currentSlide;
+          const active = index === currentSlide;
 
           return (
             <div
               key={index}
               className={`absolute inset-0 transition-opacity duration-700 ${
-                isActive
-                  ? "opacity-100 z-[1]"
+                active
+                  ? "opacity-100 z-10"
                   : "opacity-0 pointer-events-none z-0"
               }`}
             >
 
-              {/* =====================================================
-                  EMI FULL PNG SLIDE
-                  IMPORTANT: object-contain prevents cropping
-              ===================================================== */}
-              {slide.isFullBanner ? (
+              {/* =================================================
+                  EMI PNG
+                  FULL IMAGE - NO CROPPING
+              ================================================= */}
+
+              {slide.type === "emi" ? (
                 <div className="w-full h-full flex items-center justify-center bg-white">
+
                   <img
                     src="/EMI_OFFER.png"
                     alt="EMI Offer"
@@ -206,10 +267,15 @@ export default function HomePage() {
                     loading="eager"
                     fetchPriority="high"
                   />
+
                 </div>
               ) : (
+
+                /* =================================================
+                   NORMAL SLIDE
+                ================================================= */
+
                 <>
-                  {/* Normal carousel image */}
                   <img
                     src={slide.image}
                     alt={slide.title}
@@ -217,11 +283,10 @@ export default function HomePage() {
                     loading="lazy"
                   />
 
-                  {/* Dark overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
 
-                  {/* Text */}
                   <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
+
                     <div className="max-w-2xl text-white">
 
                       <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-4">
@@ -233,14 +298,19 @@ export default function HomePage() {
                       </p>
 
                       <button
-                        onClick={() => navigate(slide.link)}
+                        type="button"
+                        onClick={() =>
+                          navigate(slide.link)
+                        }
                         className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg"
                       >
                         {slide.cta}
+
                         <ArrowRight className="w-5 h-5" />
                       </button>
 
                     </div>
+
                   </div>
                 </>
               )}
@@ -248,28 +318,38 @@ export default function HomePage() {
           );
         })}
 
-        {/* Previous button */}
+        {/* =====================================================
+            PREVIOUS
+        ===================================================== */}
+
         <button
           type="button"
-          onClick={goToPreviousSlide}
+          onClick={previousSlide}
           aria-label="Previous slide"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-all"
         >
           <ChevronLeft className="w-6 h-6 sm:w-7 sm:h-7" />
         </button>
 
-        {/* Next button */}
+        {/* =====================================================
+            NEXT
+        ===================================================== */}
+
         <button
           type="button"
-          onClick={goToNextSlide}
+          onClick={nextSlide}
           aria-label="Next slide"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-all backdrop-blur-sm"
+          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center transition-all"
         >
           <ChevronRight className="w-6 h-6 sm:w-7 sm:h-7" />
         </button>
 
-        {/* Dots */}
+        {/* =====================================================
+            DOTS
+        ===================================================== */}
+
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+
           {HERO_SLIDES.map((_, index) => (
             <button
               key={index}
@@ -283,14 +363,19 @@ export default function HomePage() {
               }`}
             />
           ))}
+
         </div>
+
       </section>
 
-      {/* =========================================================
+      {/* =====================================================
           TRUST STRIP
-      ========================================================= */}
+      ===================================================== */}
+
       <section className="border-b bg-white">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-200">
 
             {TRUST_ITEMS.map((item, index) => {
@@ -301,9 +386,8 @@ export default function HomePage() {
                   key={index}
                   className="flex items-center gap-3 py-5 px-3 sm:px-6"
                 >
-                  <div className="flex-shrink-0">
-                    <Icon className="w-7 h-7 text-gray-800" />
-                  </div>
+
+                  <Icon className="w-7 h-7 text-gray-800 flex-shrink-0" />
 
                   <div>
                     <h3 className="text-sm sm:text-base font-semibold text-gray-900">
@@ -314,21 +398,27 @@ export default function HomePage() {
                       {item.text}
                     </p>
                   </div>
+
                 </div>
               );
             })}
 
           </div>
+
         </div>
+
       </section>
 
-      {/* =========================================================
+      {/* =====================================================
           CATEGORIES
-      ========================================================= */}
+      ===================================================== */}
+
       <section className="py-12 sm:py-16 bg-gray-50">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="flex items-end justify-between mb-8">
+
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-2">
                 Explore
@@ -340,50 +430,71 @@ export default function HomePage() {
             </div>
 
             <button
+              type="button"
               onClick={() => navigate("/categories")}
               className="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-900 hover:underline"
             >
               View All
               <ArrowRight className="w-4 h-4" />
             </button>
+
           </div>
 
           {loading ? (
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="h-48 rounded-xl bg-gray-200 animate-pulse"
-                />
-              ))}
+
+              {Array.from({ length: 6 }).map(
+                (_, index) => (
+                  <div
+                    key={index}
+                    className="h-48 rounded-xl bg-gray-200 animate-pulse"
+                  />
+                )
+              )}
+
             </div>
+
           ) : categories.length > 0 ? (
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
 
               {categories.map((category) => (
+
                 <button
                   key={category.id}
+                  type="button"
                   onClick={() =>
-                    navigate(`/category/${category.slug}`)
+                    navigate(
+                      `/category/${category.slug}`
+                    )
                   }
                   className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-gray-400 hover:shadow-lg transition-all text-left"
                 >
+
                   <div className="aspect-square overflow-hidden bg-gray-100">
+
                     {category.image ? (
+
                       <img
                         src={category.image}
                         alt={category.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         loading="lazy"
                       />
+
                     ) : (
+
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
                         No Image
                       </div>
+
                     )}
+
                   </div>
 
                   <div className="p-3">
+
                     <h3 className="font-semibold text-sm sm:text-base text-gray-900 line-clamp-2">
                       {category.name}
                     </h3>
@@ -392,18 +503,25 @@ export default function HomePage() {
                       Explore
                       <ArrowRight className="w-3.5 h-3.5" />
                     </div>
+
                   </div>
+
                 </button>
+
               ))}
 
             </div>
+
           ) : (
+
             <div className="text-center py-12 text-gray-500">
               No categories available.
             </div>
+
           )}
 
           <button
+            type="button"
             onClick={() => navigate("/categories")}
             className="sm:hidden mt-6 w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-3 font-semibold"
           >
@@ -412,15 +530,19 @@ export default function HomePage() {
           </button>
 
         </div>
+
       </section>
 
-      {/* =========================================================
+      {/* =====================================================
           FEATURED PRODUCTS
-      ========================================================= */}
+      ===================================================== */}
+
       <section className="py-12 sm:py-16 bg-white">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="flex items-end justify-between mb-8">
+
             <div>
               <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-2">
                 Our Collection
@@ -432,24 +554,33 @@ export default function HomePage() {
             </div>
 
             <button
+              type="button"
               onClick={() => navigate("/products")}
               className="hidden sm:flex items-center gap-2 text-sm font-semibold text-gray-900 hover:underline"
             >
               View All Products
               <ArrowRight className="w-4 h-4" />
             </button>
+
           </div>
 
           {loading ? (
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="h-80 rounded-xl bg-gray-100 animate-pulse"
-                />
-              ))}
+
+              {Array.from({ length: 8 }).map(
+                (_, index) => (
+                  <div
+                    key={index}
+                    className="h-80 rounded-xl bg-gray-100 animate-pulse"
+                  />
+                )
+              )}
+
             </div>
+
           ) : featuredProducts.length > 0 ? (
+
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
               {featuredProducts.map((product) => (
@@ -460,15 +591,19 @@ export default function HomePage() {
               ))}
 
             </div>
+
           ) : (
+
             <div className="text-center py-12 border rounded-xl">
               <p className="text-gray-500">
                 Featured products will appear here.
               </p>
             </div>
+
           )}
 
           <button
+            type="button"
             onClick={() => navigate("/products")}
             className="sm:hidden mt-6 w-full flex items-center justify-center gap-2 border border-gray-300 rounded-lg py-3 font-semibold"
           >
@@ -477,26 +612,32 @@ export default function HomePage() {
           </button>
 
         </div>
+
       </section>
 
-      {/* =========================================================
-          OWNER / ABOUT SECTION
-      ========================================================= */}
+      {/* =====================================================
+          ABOUT / OWNER
+      ===================================================== */}
+
       <section className="py-12 sm:py-16 bg-gray-50">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="grid md:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             <div className="rounded-2xl overflow-hidden bg-gray-100">
+
               <img
                 src="/onwer.png"
                 alt="Vaishnavi Marble"
                 className="w-full h-[350px] sm:h-[450px] object-cover"
                 loading="lazy"
               />
+
             </div>
 
             <div>
+
               <p className="text-sm font-semibold uppercase tracking-wider text-gray-500 mb-3">
                 About Vaishnavi Marble
               </p>
@@ -506,39 +647,47 @@ export default function HomePage() {
               </h2>
 
               <p className="text-gray-600 leading-relaxed mb-5">
-                We provide a wide range of marble, granite, tiles,
-                sanitaryware, kitchen sinks, bathroom vanities and
-                other products for residential and commercial spaces.
+                We provide a wide range of marble, granite,
+                tiles, sanitaryware, kitchen sinks, bathroom
+                vanities and other products for residential
+                and commercial spaces.
               </p>
 
               <p className="text-gray-600 leading-relaxed mb-7">
-                Our focus is on quality products, reliable service
-                and helping customers find the right solution for
-                their projects.
+                Our focus is on quality products, reliable
+                service and helping customers find the right
+                solution for their projects.
               </p>
 
               <button
+                type="button"
                 onClick={() => navigate("/about")}
                 className="inline-flex items-center gap-2 bg-gray-900 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-all"
               >
                 Know More
                 <ArrowRight className="w-5 h-5" />
               </button>
+
             </div>
 
           </div>
+
         </div>
+
       </section>
 
-      {/* =========================================================
-          BULK / WHOLESALE CTA
-      ========================================================= */}
+      {/* =====================================================
+          BULK / WHOLESALE
+      ===================================================== */}
+
       <section className="py-12 sm:py-16 bg-gray-900 text-white">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           <div className="grid md:grid-cols-2 gap-8 items-center">
 
             <div>
+
               <p className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
                 For Business
               </p>
@@ -548,15 +697,17 @@ export default function HomePage() {
               </h2>
 
               <p className="text-gray-300 leading-relaxed max-w-xl">
-                Planning a residential, commercial or large-scale
-                project? Contact us for bulk requirements and
-                customised product enquiries.
+                Planning a residential, commercial or
+                large-scale project? Contact us for bulk
+                requirements and customised product enquiries.
               </p>
+
             </div>
 
             <div className="flex flex-col sm:flex-row md:justify-end gap-3">
 
               <button
+                type="button"
                 onClick={handleWhatsApp}
                 className="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-all"
               >
@@ -565,6 +716,7 @@ export default function HomePage() {
               </button>
 
               <button
+                type="button"
                 onClick={() => navigate("/contact")}
                 className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 hover:bg-gray-100 px-6 py-3 rounded-lg font-semibold transition-all"
               >
@@ -575,9 +727,11 @@ export default function HomePage() {
             </div>
 
           </div>
+
         </div>
+
       </section>
 
-    </div>
+    </main>
   );
 }
