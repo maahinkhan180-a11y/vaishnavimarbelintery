@@ -10,12 +10,12 @@ import {
   ShieldCheck,
   Headphones,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import { supabase } from "@/lib/supabase";
 import type { Category, Product } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
 import { whatsappEnquiry } from "@/lib/whatsapp";
+import { useRouter } from "@/lib/router";
 
 type HeroSlide = {
   type?: "image" | "emi";
@@ -32,8 +32,8 @@ const HERO_SLIDES: HeroSlide[] = [
     image: "/EMI_OFFER.png",
   },
   {
-    type: "image",
-    image: "https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg",
+    image:
+      "https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg",
     title: "Premium Marble & Tiles",
     subtitle:
       "Transform your home with premium marble, granite and designer tiles.",
@@ -41,8 +41,8 @@ const HERO_SLIDES: HeroSlide[] = [
     link: "/category/marble-granite",
   },
   {
-    type: "image",
-    image: "https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg",
+    image:
+      "https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg",
     title: "Designer Kitchen & Bath Tiles",
     subtitle:
       "Beautiful and durable tiles for modern kitchens and bathrooms.",
@@ -50,8 +50,8 @@ const HERO_SLIDES: HeroSlide[] = [
     link: "/category/tiles",
   },
   {
-    type: "image",
-    image: "https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg",
+    image:
+      "https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg",
     title: "Marble, Granite & Sanitaryware",
     subtitle:
       "Complete solutions for your home, office and commercial projects.",
@@ -59,8 +59,8 @@ const HERO_SLIDES: HeroSlide[] = [
     link: "/products",
   },
   {
-    type: "image",
-    image: "https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg",
+    image:
+      "https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg",
     title: "Marble Statues & Mandirs",
     subtitle:
       "Elegant marble statues, mandirs and handcrafted decorative pieces.",
@@ -93,16 +93,16 @@ const TRUST_ITEMS = [
 ];
 
 export function HomePage() {
-  const navigate = useNavigate();
+  const { navigate } = useRouter();
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* --------------------------------
+  /* =====================================
      PRELOAD HERO IMAGES
-  -------------------------------- */
+  ===================================== */
   useEffect(() => {
     HERO_SLIDES.forEach((slide) => {
       const image = new Image();
@@ -110,9 +110,9 @@ export function HomePage() {
     });
   }, []);
 
-  /* --------------------------------
-     AUTO HERO SLIDER
-  -------------------------------- */
+  /* =====================================
+     AUTO SLIDER
+  ===================================== */
   useEffect(() => {
     const timer = window.setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
@@ -121,9 +121,9 @@ export function HomePage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  /* --------------------------------
-     LOAD HOME DATA
-  -------------------------------- */
+  /* =====================================
+     LOAD CATEGORIES + PRODUCTS
+  ===================================== */
   const loadHomeData = useCallback(async () => {
     try {
       setLoading(true);
@@ -158,7 +158,9 @@ export function HomePage() {
         );
         setFeaturedProducts([]);
       } else {
-        setFeaturedProducts((productsResult.data || []) as Product[]);
+        setFeaturedProducts(
+          (productsResult.data || []) as Product[]
+        );
       }
     } catch (error) {
       console.error("Home page data loading error:", error);
@@ -173,9 +175,9 @@ export function HomePage() {
     loadHomeData();
   }, [loadHomeData]);
 
-  /* --------------------------------
+  /* =====================================
      CATEGORY URL
-  -------------------------------- */
+  ===================================== */
   const getCategoryLink = (category: Category) => {
     const categoryData = category as Category & {
       slug?: string | null;
@@ -193,24 +195,25 @@ export function HomePage() {
     return `/category/${slug}`;
   };
 
-  /* --------------------------------
-     SLIDER CONTROLS
-  -------------------------------- */
+  /* =====================================
+     SLIDER
+  ===================================== */
   const previousSlide = () => {
     setCurrentSlide(
-      (prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length
+      (prev) =>
+        (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length
     );
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    setCurrentSlide(
+      (prev) => (prev + 1) % HERO_SLIDES.length
+    );
   };
 
-  const currentHero = HERO_SLIDES[currentSlide];
-
-  /* --------------------------------
-     WHATSAPP ENQUIRY
-  -------------------------------- */
+  /* =====================================
+     WHATSAPP
+  ===================================== */
   const handleWhatsApp = () => {
     try {
       const url = whatsappEnquiry(
@@ -225,11 +228,13 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
+
       {/* =====================================
-          HERO SECTION
+          HERO
       ===================================== */}
       <section className="relative overflow-hidden bg-slate-900">
         <div className="relative min-h-[520px] md:min-h-[620px]">
+
           {HERO_SLIDES.map((slide, index) => (
             <div
               key={`${slide.image}-${index}`}
@@ -245,13 +250,13 @@ export function HomePage() {
                 className="h-full w-full object-cover"
               />
 
-              {/* Dark overlay */}
               <div className="absolute inset-0 bg-black/45" />
 
-              {/* EMI Slide */}
+              {/* EMI SLIDE */}
               {slide.type === "emi" ? (
                 <div className="absolute inset-0 flex items-center justify-center px-4">
                   <div className="max-w-5xl text-center text-white">
+
                     <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-5 py-2 text-sm font-semibold backdrop-blur-sm">
                       Special Offer
                     </div>
@@ -261,11 +266,12 @@ export function HomePage() {
                     </h1>
 
                     <p className="mx-auto mt-5 max-w-2xl text-lg text-white/90 md:text-xl">
-                      Make your dream home beautiful with premium marble,
-                      tiles and sanitaryware.
+                      Make your dream home beautiful with premium
+                      marble, tiles and sanitaryware.
                     </p>
 
                     <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+
                       <button
                         type="button"
                         onClick={() => navigate("/products")}
@@ -283,14 +289,18 @@ export function HomePage() {
                         <MessageCircle className="h-5 w-5" />
                         Enquire on WhatsApp
                       </button>
+
                     </div>
                   </div>
                 </div>
               ) : (
-                /* Normal Hero Slide */
+
+                /* NORMAL SLIDE */
                 <div className="absolute inset-0 flex items-center">
                   <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
+
                     <div className="max-w-3xl text-white">
+
                       <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
                         Vaishnavi Marble & Tiles
                       </div>
@@ -304,11 +314,14 @@ export function HomePage() {
                       </p>
 
                       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
                         <button
                           type="button"
-                          onClick={() =>
-                            slide.link && navigate(slide.link)
-                          }
+                          onClick={() => {
+                            if (slide.link) {
+                              navigate(slide.link);
+                            }
+                          }}
                           className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-3.5 font-bold text-slate-900 shadow-lg transition hover:bg-slate-100"
                         >
                           {slide.button || "Explore"}
@@ -323,6 +336,7 @@ export function HomePage() {
                           <MessageCircle className="h-5 w-5" />
                           WhatsApp Enquiry
                         </button>
+
                       </div>
                     </div>
                   </div>
@@ -331,7 +345,7 @@ export function HomePage() {
             </div>
           ))}
 
-          {/* Previous */}
+          {/* PREVIOUS */}
           <button
             type="button"
             onClick={previousSlide}
@@ -341,7 +355,7 @@ export function HomePage() {
             <ChevronLeft className="h-6 w-6" />
           </button>
 
-          {/* Next */}
+          {/* NEXT */}
           <button
             type="button"
             onClick={nextSlide}
@@ -351,9 +365,9 @@ export function HomePage() {
             <ChevronRight className="h-6 w-6" />
           </button>
 
-          {/* Dots */}
+          {/* DOTS */}
           <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
-            {HERO_SLIDES.map((slide, index) => (
+            {HERO_SLIDES.map((_, index) => (
               <button
                 key={`dot-${index}`}
                 type="button"
@@ -371,10 +385,11 @@ export function HomePage() {
       </section>
 
       {/* =====================================
-          TRUST STRIP
+          TRUST
       ===================================== */}
       <section className="border-b bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y sm:grid-cols-4 sm:divide-y-0">
+
           {TRUST_ITEMS.map((item) => {
             const Icon = item.icon;
 
@@ -391,6 +406,7 @@ export function HomePage() {
                   <h3 className="text-sm font-bold text-slate-900">
                     {item.title}
                   </h3>
+
                   <p className="mt-0.5 text-xs leading-5 text-slate-500">
                     {item.description}
                   </p>
@@ -398,6 +414,7 @@ export function HomePage() {
               </div>
             );
           })}
+
         </div>
       </section>
 
@@ -406,7 +423,9 @@ export function HomePage() {
       ===================================== */}
       <section className="bg-slate-50 py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
             <div>
               <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                 Shop by Category
@@ -430,9 +449,11 @@ export function HomePage() {
               View All Products
               <ArrowRight className="h-4 w-4" />
             </button>
+
           </div>
 
           {loading ? (
+
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div
@@ -441,11 +462,15 @@ export function HomePage() {
                 />
               ))}
             </div>
+
           ) : categories.length > 0 ? (
+
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+
               {categories.map((category) => {
                 const categoryData = category as Category & {
                   image_url?: string | null;
+                  slug?: string | null;
                 };
 
                 return (
@@ -458,6 +483,7 @@ export function HomePage() {
                     className="group overflow-hidden rounded-2xl bg-white text-left shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+
                       {categoryData.image_url ? (
                         <img
                           src={categoryData.image_url}
@@ -477,13 +503,18 @@ export function HomePage() {
                           {category.name}
                         </h3>
                       </div>
+
                     </div>
                   </button>
                 );
               })}
+
             </div>
+
           ) : (
+
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+
               <h3 className="text-lg font-bold text-slate-900">
                 Categories Coming Soon
               </h3>
@@ -500,6 +531,7 @@ export function HomePage() {
                 Browse Products
                 <ArrowRight className="h-4 w-4" />
               </button>
+
             </div>
           )}
         </div>
@@ -510,7 +542,9 @@ export function HomePage() {
       ===================================== */}
       <section className="bg-white py-16 sm:py-20">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+
             <div>
               <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                 Featured Products
@@ -534,9 +568,11 @@ export function HomePage() {
               View All
               <ArrowRight className="h-4 w-4" />
             </button>
+
           </div>
 
           {loading ? (
+
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div
@@ -545,17 +581,24 @@ export function HomePage() {
                 />
               ))}
             </div>
+
           ) : featuredProducts.length > 0 ? (
+
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+
               {featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                 />
               ))}
+
             </div>
+
           ) : (
+
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
+
               <h3 className="text-lg font-bold text-slate-900">
                 Featured Products Coming Soon
               </h3>
@@ -573,17 +616,20 @@ export function HomePage() {
                 Browse All Products
                 <ArrowRight className="h-4 w-4" />
               </button>
+
             </div>
           )}
         </div>
       </section>
 
       {/* =====================================
-          ABOUT / OWNER SECTION
+          ABOUT
       ===================================== */}
       <section className="bg-slate-900 py-16 text-white sm:py-20">
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+
           <div className="grid items-center gap-10 lg:grid-cols-2">
+
             <div className="overflow-hidden rounded-3xl bg-slate-800">
               <img
                 src="/onwer.png"
@@ -593,6 +639,7 @@ export function HomePage() {
             </div>
 
             <div>
+
               <p className="text-sm font-bold uppercase tracking-wider text-white/60">
                 About Vaishnavi Marble
               </p>
@@ -614,6 +661,7 @@ export function HomePage() {
               </p>
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+
                 <button
                   type="button"
                   onClick={() => navigate("/products")}
@@ -631,17 +679,20 @@ export function HomePage() {
                   <MessageCircle className="h-5 w-5" />
                   Talk to Us
                 </button>
+
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
       {/* =====================================
-          BULK / WHOLESALE CTA
+          BULK / PROJECT CTA
       ===================================== */}
       <section className="bg-slate-50 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
+
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white">
             <Phone className="h-6 w-6" />
           </div>
@@ -657,6 +708,7 @@ export function HomePage() {
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+
             <button
               type="button"
               onClick={handleWhatsApp}
@@ -673,9 +725,11 @@ export function HomePage() {
               <Phone className="h-5 w-5" />
               Call Us
             </a>
+
           </div>
         </div>
       </section>
+
     </div>
   );
 }
