@@ -22,6 +22,21 @@ import { ProductCard } from '@/components/ProductCard';
 import { whatsappEnquiry } from '@/lib/whatsapp';
 
 const HERO_SLIDES = [
+  // ============================================================
+  // FIRST SLIDE - EMI OFFER
+  // ============================================================
+  {
+    image: '/EMI_OFFER.png',
+    title: '',
+    subtitle: '',
+    cta: '',
+    link: '#',
+    isFullBanner: true,
+  },
+
+  // ============================================================
+  // EXISTING SLIDE 2
+  // ============================================================
   {
     image:
       'https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -29,7 +44,12 @@ const HERO_SLIDES = [
     subtitle: 'Exquisite craftsmanship for your dream home',
     cta: 'Shop Marble Statues',
     link: '/category/marble-statues',
+    isFullBanner: false,
   },
+
+  // ============================================================
+  // EXISTING SLIDE 3
+  // ============================================================
   {
     image:
       'https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -37,7 +57,12 @@ const HERO_SLIDES = [
     subtitle: 'Transform your spaces with style',
     cta: 'Explore Tiles',
     link: '/category/tiles',
+    isFullBanner: false,
   },
+
+  // ============================================================
+  // EXISTING SLIDE 4
+  // ============================================================
   {
     image:
       'https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -45,7 +70,12 @@ const HERO_SLIDES = [
     subtitle: "Kolkata’s leading destination for quality",
     cta: 'View All Products',
     link: '/category/marble-granite',
+    isFullBanner: false,
   },
+
+  // ============================================================
+  // EXISTING SLIDE 5
+  // ============================================================
   {
     image:
       'https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -53,6 +83,7 @@ const HERO_SLIDES = [
     subtitle: 'Handcrafted with devotion and precision',
     cta: 'Shop Statues',
     link: '/category/marble-statues',
+    isFullBanner: false,
   },
 ];
 
@@ -62,6 +93,9 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  // ============================================================
+  // LOAD DATA
+  // ============================================================
   useEffect(() => {
     Promise.all([
       supabase
@@ -82,12 +116,18 @@ export function HomePage() {
     });
   }, []);
 
+  // ============================================================
+  // NEXT SLIDE
+  // ============================================================
   const nextSlide = useCallback(() => {
     setCurrentSlide(
       (prev) => (prev + 1) % HERO_SLIDES.length
     );
   }, []);
 
+  // ============================================================
+  // PREVIOUS SLIDE
+  // ============================================================
   const prevSlide = useCallback(() => {
     setCurrentSlide(
       (prev) =>
@@ -96,6 +136,9 @@ export function HomePage() {
     );
   }, []);
 
+  // ============================================================
+  // AUTO SLIDE
+  // ============================================================
   useEffect(() => {
     const timer = setInterval(nextSlide, 5000);
 
@@ -108,68 +151,98 @@ export function HomePage() {
       {/* =====================================================
           HERO SLIDER
       ====================================================== */}
-      <section className="relative h-[420px] md:h-[520px] overflow-hidden bg-black">
+      <section className="relative w-full h-[300px] sm:h-[380px] md:h-[480px] lg:h-[560px] overflow-hidden bg-black">
+
         {HERO_SLIDES.map((slide, idx) => (
           <div
             key={idx}
             className={`absolute inset-0 transition-opacity duration-1000 ${
               idx === currentSlide
-                ? 'opacity-100'
-                : 'opacity-0 pointer-events-none'
+                ? 'opacity-100 z-[1]'
+                : 'opacity-0 pointer-events-none z-0'
             }`}
           >
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-            />
 
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
+            {/* =================================================
+                EMI FULL BANNER
+            ================================================== */}
+            {slide.isFullBanner ? (
+              <img
+                src={slide.image}
+                alt="EMI Offer"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <>
+                {/* =================================================
+                    NORMAL SLIDE IMAGE
+                ================================================== */}
+                <img
+                  src={slide.image}
+                  alt={slide.title}
+                  className="w-full h-full object-cover"
+                />
 
-            <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
-              <div className="max-w-2xl">
+                {/* =================================================
+                    NORMAL SLIDE OVERLAY
+                ================================================== */}
+                <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20" />
 
-                <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-3">
-                  {slide.title}
-                </h2>
+                {/* =================================================
+                    NORMAL SLIDE CONTENT
+                ================================================== */}
+                <div className="relative max-w-7xl mx-auto px-4 h-full flex items-center">
+                  <div className="max-w-2xl">
 
-                <p className="text-lg text-slate-200 mb-6">
-                  {slide.subtitle}
-                </p>
+                    <h2 className="text-3xl md:text-5xl font-bold text-white leading-tight mb-3">
+                      {slide.title}
+                    </h2>
 
-                <button
-                  onClick={() => navigate(slide.link)}
-                  className="bg-[#ff9d17] text-black px-6 py-3 rounded-sm font-bold hover:bg-white transition-colors inline-flex items-center gap-2"
-                >
-                  {slide.cta}
-                  <ArrowRight size={18} />
-                </button>
+                    <p className="text-lg text-slate-200 mb-6">
+                      {slide.subtitle}
+                    </p>
 
-              </div>
-            </div>
+                    <button
+                      onClick={() => navigate(slide.link)}
+                      className="bg-[#ff9d17] text-black px-6 py-3 rounded-sm font-bold hover:bg-white transition-colors inline-flex items-center gap-2"
+                    >
+                      {slide.cta}
+                      <ArrowRight size={18} />
+                    </button>
+
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         ))}
 
-        {/* Previous Arrow */}
+        {/* =====================================================
+            PREVIOUS ARROW
+        ====================================================== */}
         <button
           onClick={prevSlide}
-          className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
+          className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
           aria-label="Previous slide"
         >
           <ChevronLeft size={22} />
         </button>
 
-        {/* Next Arrow */}
+        {/* =====================================================
+            NEXT ARROW
+        ====================================================== */}
         <button
           onClick={nextSlide}
-          className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
+          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 bg-black/40 hover:bg-[#ff9d17] text-white rounded-full flex items-center justify-center transition-colors z-10"
           aria-label="Next slide"
         >
           <ChevronRight size={22} />
         </button>
 
-        {/* Slider Dots */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {/* =====================================================
+            SLIDER DOTS
+        ====================================================== */}
+        <div className="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {HERO_SLIDES.map((_, idx) => (
             <button
               key={idx}
@@ -283,6 +356,7 @@ export function HomePage() {
               }
               className="group relative aspect-square rounded-xl overflow-hidden bg-stone-100 hover:shadow-xl transition-all"
             >
+
               {cat.image_url && (
                 <img
                   src={cat.image_url}
@@ -358,30 +432,25 @@ export function HomePage() {
       </section>
 
       {/* =====================================================
-          MEET THE OWNER - PREMIUM SECTION
+          MEET THE OWNER
       ====================================================== */}
       <section className="max-w-7xl mx-auto px-4 py-16">
 
         <div className="relative overflow-hidden rounded-3xl bg-white border border-stone-200 shadow-xl">
 
-          {/* Decorative Background */}
           <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#ff9d17]/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="absolute -bottom-24 -left-24 w-72 h-72 bg-[#ff9d17]/5 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative grid grid-cols-1 md:grid-cols-2 items-stretch">
 
-            {/* =================================================
-                OWNER IMAGE
-            ================================================== */}
+            {/* OWNER IMAGE */}
             <div className="relative min-h-[430px] md:min-h-[570px] bg-gradient-to-br from-stone-100 via-white to-stone-200 flex items-center justify-center p-5 sm:p-7 md:p-10">
 
-              {/* Orange decorative border */}
               <div className="absolute top-5 left-5 w-20 h-20 border-t-4 border-l-4 border-[#ff9d17] rounded-tl-2xl opacity-80" />
 
               <div className="absolute bottom-5 right-5 w-20 h-20 border-b-4 border-r-4 border-[#ff9d17] rounded-br-2xl opacity-80" />
 
-              {/* Image Frame */}
               <div className="relative w-full h-full min-h-[390px] md:min-h-[510px] rounded-2xl overflow-hidden border border-white shadow-xl bg-white flex items-center justify-center">
 
                 <img
@@ -390,7 +459,6 @@ export function HomePage() {
                   className="w-full h-full object-contain"
                 />
 
-                {/* Image Bottom Badge */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/85 backdrop-blur-md text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold tracking-wider whitespace-nowrap shadow-lg">
                   VAISHNAVI MARBLE
                 </div>
@@ -399,47 +467,30 @@ export function HomePage() {
 
             </div>
 
-            {/* =================================================
-                OWNER CONTENT
-            ================================================== */}
+            {/* OWNER CONTENT */}
             <div className="relative flex flex-col justify-center p-7 sm:p-10 md:p-12 lg:p-16">
 
-              {/* Section Label */}
               <div className="mb-5">
-
                 <span className="inline-flex items-center gap-2 text-[#ff9d17] font-bold text-sm tracking-[0.18em] uppercase">
-
                   <span className="w-9 h-[2px] bg-[#ff9d17]" />
-
                   Meet the Owner
-
                 </span>
-
               </div>
 
-              {/* Main Heading */}
               <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 leading-tight mb-5">
-
                 Welcome to
 
                 <span className="block text-[#ff9d17] mt-1">
                   Vaishnavi Marble
                 </span>
-
               </h2>
 
-              {/* Decorative Line */}
               <div className="flex items-center gap-2 mb-7">
-
                 <span className="w-14 h-1 bg-[#ff9d17] rounded-full" />
-
                 <span className="w-2 h-1 bg-[#ff9d17]/40 rounded-full" />
-
                 <span className="w-2 h-1 bg-[#ff9d17]/20 rounded-full" />
-
               </div>
 
-              {/* Description */}
               <p className="text-stone-600 text-base md:text-lg leading-relaxed mb-5">
                 At Vaishnavi Marble, we bring you the finest
                 selection of marble, tiles, sanitaryware, and
@@ -455,9 +506,6 @@ export function HomePage() {
                 Visit our showroom to explore our exclusive collection.
               </p>
 
-              {/* =================================================
-                  IMPRESSIVE HIGHLIGHT
-              ================================================== */}
               <div className="relative border-l-4 border-[#ff9d17] bg-gradient-to-r from-[#ff9d17]/10 to-transparent rounded-r-xl px-5 py-4 mb-8">
 
                 <div className="absolute -left-[9px] top-5 w-3 h-3 rounded-full bg-[#ff9d17] ring-4 ring-[#ff9d17]/20" />
@@ -472,9 +520,6 @@ export function HomePage() {
 
               </div>
 
-              {/* =================================================
-                  BUTTONS
-              ================================================== */}
               <div className="flex flex-wrap gap-3">
 
                 <a
@@ -512,7 +557,6 @@ export function HomePage() {
 
         <div className="relative overflow-hidden bg-black rounded-2xl p-10 md:p-16 text-center text-white">
 
-          {/* Decorative Orange Glow */}
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-[#ff9d17]/20 rounded-full blur-3xl" />
 
           <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-[#ff9d17]/10 rounded-full blur-3xl" />
