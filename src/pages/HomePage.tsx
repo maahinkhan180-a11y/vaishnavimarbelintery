@@ -14,10 +14,7 @@ import { useNavigate } from "react-router-dom";
 
 import { supabase } from "@/lib/supabase";
 import type { Category, Product } from "@/types";
-
-// ✅ FIXED: ProductCard is a named export
 import { ProductCard } from "@/components/ProductCard";
-
 import { whatsappEnquiry } from "@/lib/whatsapp";
 
 type HeroSlide =
@@ -35,17 +32,10 @@ type HeroSlide =
     };
 
 const HERO_SLIDES: HeroSlide[] = [
-  // =========================================================
-  // 1. EMI OFFER - FIRST SLIDE
-  // =========================================================
   {
     type: "emi",
     image: "/EMI_OFFER.png",
   },
-
-  // =========================================================
-  // 2. MARBLE
-  // =========================================================
   {
     type: "image",
     image:
@@ -53,13 +43,9 @@ const HERO_SLIDES: HeroSlide[] = [
     title: "Premium Marble & Tiles",
     subtitle:
       "Premium quality marble, tiles and surfaces for beautiful spaces.",
-    cta: "Shop Marble Statues",
-    link: "/category/marble-statues",
+    cta: "Shop Marble",
+    link: "/category/marble-granite",
   },
-
-  // =========================================================
-  // 3. TILES
-  // =========================================================
   {
     type: "image",
     image:
@@ -70,10 +56,6 @@ const HERO_SLIDES: HeroSlide[] = [
     cta: "Explore Tiles",
     link: "/category/tiles",
   },
-
-  // =========================================================
-  // 4. MARBLE + GRANITE + SANITARYWARE
-  // =========================================================
   {
     type: "image",
     image:
@@ -81,13 +63,9 @@ const HERO_SLIDES: HeroSlide[] = [
     title: "Marble, Granite & Sanitaryware",
     subtitle:
       "Complete solutions for residential and commercial projects.",
-    cta: "View All Products",
-    link: "/category/marble-granite",
+    cta: "View Products",
+    link: "/products",
   },
-
-  // =========================================================
-  // 5. MARBLE STATUES
-  // =========================================================
   {
     type: "image",
     image:
@@ -104,7 +82,6 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   const [currentSlide, setCurrentSlide] = useState(0);
-
   const [categories, setCategories] = useState<Category[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,7 +97,7 @@ export default function HomePage() {
   }, []);
 
   // =========================================================
-  // AUTO SLIDER - 10 SECONDS
+  // AUTO SLIDER
   // =========================================================
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -129,16 +106,18 @@ export default function HomePage() {
       );
     }, 10000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
   // =========================================================
-  // LOAD DATA FROM SUPABASE
+  // LOAD HOME DATA
   // =========================================================
   const loadHomeData = useCallback(async () => {
-    try {
-      setLoading(true);
+    setLoading(true);
 
+    try {
       const [categoriesResponse, productsResponse] =
         await Promise.all([
           supabase
@@ -158,6 +137,9 @@ export default function HomePage() {
           "Categories loading error:",
           categoriesResponse.error
         );
+        setCategories([]);
+      } else {
+        setCategories(categoriesResponse.data ?? []);
       }
 
       if (productsResponse.error) {
@@ -165,12 +147,15 @@ export default function HomePage() {
           "Products loading error:",
           productsResponse.error
         );
+        setFeaturedProducts([]);
+      } else {
+        setFeaturedProducts(productsResponse.data ?? []);
       }
-
-      setCategories(categoriesResponse.data || []);
-      setFeaturedProducts(productsResponse.data || []);
     } catch (error) {
       console.error("Home page data error:", error);
+
+      setCategories([]);
+      setFeaturedProducts([]);
     } finally {
       setLoading(false);
     }
@@ -204,16 +189,21 @@ export default function HomePage() {
   const slide = HERO_SLIDES[currentSlide];
 
   // =========================================================
-  // CATEGORY CLICK
+  // CATEGORY LINK
   // =========================================================
   const getCategoryLink = (category: Category) => {
+    const categoryWithSlug = category as Category & {
+      slug?: string | null;
+    };
+
     const slug =
-      "slug" in category && category.slug
-        ? category.slug
-        : String(category.name)
-            .toLowerCase()
-            .trim()
-            .replace(/\s+/g, "-");
+      categoryWithSlug.slug?.trim() ||
+      String(category.name)
+        .toLowerCase()
+        .trim()
+        .replace(/&/g, "and")
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-");
 
     return `/category/${slug}`;
   };
@@ -224,23 +214,17 @@ export default function HomePage() {
           HERO / CAROUSEL
       ====================================================== */}
       <section className="relative w-full h-[280px] sm:h-[330px] md:h-[400px] lg:h-[460px] overflow-hidden bg-white">
-        {/* ===================================================
-            EMI SLIDE
-        ==================================================== */}
         {slide.type === "emi" ? (
           <div className="w-full h-full flex items-center justify-center bg-white">
             <img
-              src="/EMI_OFFER.png"
-              alt="EMI Offer"
+              src={slide.image}
+              alt="Special EMI Offer"
               className="w-full h-full object-contain"
               loading="eager"
               fetchPriority="high"
             />
           </div>
         ) : (
-          /* =================================================
-             NORMAL SLIDES
-          ================================================== */
           <div className="relative w-full h-full">
             <img
               src={slide.image}
@@ -249,10 +233,8 @@ export default function HomePage() {
               loading="eager"
             />
 
-            {/* Dark overlay */}
             <div className="absolute inset-0 bg-black/40" />
 
-            {/* Text */}
             <div className="absolute inset-0 flex items-center">
               <div className="container mx-auto px-5 sm:px-8 lg:px-12">
                 <div className="max-w-2xl text-white">
@@ -265,6 +247,7 @@ export default function HomePage() {
                   </p>
 
                   <button
+                    type="button"
                     onClick={() => navigate(slide.link)}
                     className="mt-6 inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors"
                   >
@@ -277,9 +260,7 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ===================================================
-            PREVIOUS BUTTON
-        ==================================================== */}
+        {/* Previous */}
         <button
           type="button"
           onClick={previousSlide}
@@ -289,9 +270,7 @@ export default function HomePage() {
           <ChevronLeft size={22} />
         </button>
 
-        {/* ===================================================
-            NEXT BUTTON
-        ==================================================== */}
+        {/* Next */}
         <button
           type="button"
           onClick={nextSlide}
@@ -301,9 +280,7 @@ export default function HomePage() {
           <ChevronRight size={22} />
         </button>
 
-        {/* ===================================================
-            DOTS
-        ==================================================== */}
+        {/* Dots */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
           {HERO_SLIDES.map((_, index) => (
             <button
@@ -328,7 +305,7 @@ export default function HomePage() {
         <div className="container mx-auto px-5 sm:px-8 lg:px-12">
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-stone-200">
             <div className="flex items-center gap-3 py-5 px-3">
-              <Truck className="text-stone-700" size={24} />
+              <Truck className="text-stone-700 shrink-0" size={24} />
               <div>
                 <p className="font-semibold text-stone-800 text-sm">
                   Fast Delivery
@@ -340,7 +317,10 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-3 py-5 px-3">
-              <ShieldCheck className="text-stone-700" size={24} />
+              <ShieldCheck
+                className="text-stone-700 shrink-0"
+                size={24}
+              />
               <div>
                 <p className="font-semibold text-stone-800 text-sm">
                   Quality Assured
@@ -352,7 +332,7 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-3 py-5 px-3">
-              <Award className="text-stone-700" size={24} />
+              <Award className="text-stone-700 shrink-0" size={24} />
               <div>
                 <p className="font-semibold text-stone-800 text-sm">
                   Trusted Service
@@ -364,7 +344,10 @@ export default function HomePage() {
             </div>
 
             <div className="flex items-center gap-3 py-5 px-3">
-              <Headphones className="text-stone-700" size={24} />
+              <Headphones
+                className="text-stone-700 shrink-0"
+                size={24}
+              />
               <div>
                 <p className="font-semibold text-stone-800 text-sm">
                   Expert Support
@@ -416,10 +399,12 @@ export default function HomePage() {
           ) : categories.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
               {categories.map((category) => {
+                const categoryData = category as Category & {
+                  image_url?: string | null;
+                };
+
                 const categoryImage =
-                  "image_url" in category
-                    ? category.image_url
-                    : undefined;
+                  categoryData.image_url || null;
 
                 return (
                   <button
@@ -445,7 +430,7 @@ export default function HomePage() {
                       )}
                     </div>
 
-                    <h3 className="mt-3 font-semibold text-stone-800 text-sm group-hover:text-stone-600">
+                    <h3 className="mt-3 font-semibold text-stone-800 text-sm group-hover:text-stone-600 transition-colors">
                       {category.name}
                     </h3>
                   </button>
@@ -457,6 +442,15 @@ export default function HomePage() {
               No categories available.
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={() => navigate("/categories")}
+            className="sm:hidden mt-6 mx-auto flex items-center gap-1 text-sm font-semibold text-stone-700"
+          >
+            View All Categories
+            <ArrowRight size={16} />
+          </button>
         </div>
       </section>
 
@@ -511,16 +505,24 @@ export default function HomePage() {
               </p>
             </div>
           )}
+
+          <button
+            type="button"
+            onClick={() => navigate("/products")}
+            className="sm:hidden mt-6 mx-auto flex items-center gap-1 text-sm font-semibold text-stone-700"
+          >
+            View All Products
+            <ArrowRight size={16} />
+          </button>
         </div>
       </section>
 
       {/* =====================================================
-          OWNER / ABOUT SECTION
+          ABOUT / OWNER
       ====================================================== */}
       <section className="py-12 sm:py-16 bg-stone-50">
         <div className="container mx-auto px-5 sm:px-8 lg:px-12">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Owner Image */}
             <div className="rounded-2xl overflow-hidden bg-white border border-stone-200">
               <img
                 src="/onwer.png"
@@ -530,7 +532,6 @@ export default function HomePage() {
               />
             </div>
 
-            {/* Content */}
             <div>
               <p className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
                 About Us
@@ -615,7 +616,7 @@ export default function HomePage() {
               </a>
 
               <a
-                href="tel:+919999999999"
+                href="tel:+919330300408"
                 className="inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors"
               >
                 <Phone size={18} />
