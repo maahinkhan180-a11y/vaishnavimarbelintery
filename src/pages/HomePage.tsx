@@ -257,30 +257,6 @@ export function HomePage() {
                 <div className="absolute inset-0 flex items-center justify-center px-4">
                   <div className="max-w-5xl text-center text-white">
 
-                    <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-5 py-2 text-sm font-semibold backdrop-blur-sm">
-                      Special Offer
-                    </div>
-
-                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
-                      Easy EMI Available
-                    </h1>
-
-                    <p className="mx-auto mt-5 max-w-2xl text-lg text-white/90 md:text-xl">
-                      Make your dream home beautiful with premium
-                      marble, tiles and sanitaryware.
-                    </p>
-
-                    <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-
-                      <button
-                        type="button"
-                        onClick={() => navigate("/products")}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-3.5 font-bold text-slate-900 shadow-lg transition hover:bg-slate-100"
-                      >
-                        Explore Products
-                        <ArrowRight className="h-5 w-5" />
-                      </button>
-
                       <button
                         type="button"
                         onClick={handleWhatsApp}
