@@ -17,19 +17,14 @@ import type { Category, Product } from "@/types";
 import { ProductCard } from "@/components/ProductCard";
 import { whatsappEnquiry } from "@/lib/whatsapp";
 
-type HeroSlide =
-  | {
-      type: "emi";
-      image: string;
-    }
-  | {
-      type: "image";
-      image: string;
-      title: string;
-      subtitle: string;
-      cta: string;
-      link: string;
-    };
+type HeroSlide = {
+  type?: "image" | "emi";
+  image: string;
+  title?: string;
+  subtitle?: string;
+  button?: string;
+  link?: string;
+};
 
 const HERO_SLIDES: HeroSlide[] = [
   {
@@ -38,47 +33,66 @@ const HERO_SLIDES: HeroSlide[] = [
   },
   {
     type: "image",
-    image:
-      "https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    image: "https://images.pexels.com/photos/7195883/pexels-photo-7195883.jpeg",
     title: "Premium Marble & Tiles",
     subtitle:
-      "Premium quality marble, tiles and surfaces for beautiful spaces.",
-    cta: "Shop Marble",
+      "Transform your home with premium marble, granite and designer tiles.",
+    button: "Shop Marble",
     link: "/category/marble-granite",
   },
   {
     type: "image",
-    image:
-      "https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    image: "https://images.pexels.com/photos/6969861/pexels-photo-6969861.jpeg",
     title: "Designer Kitchen & Bath Tiles",
     subtitle:
-      "Modern designs and premium finishes for your kitchen and bathroom.",
-    cta: "Explore Tiles",
+      "Beautiful and durable tiles for modern kitchens and bathrooms.",
+    button: "Explore Tiles",
     link: "/category/tiles",
   },
   {
     type: "image",
-    image:
-      "https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    image: "https://images.pexels.com/photos/10410101/pexels-photo-10410101.jpeg",
     title: "Marble, Granite & Sanitaryware",
     subtitle:
-      "Complete solutions for residential and commercial projects.",
-    cta: "View Products",
+      "Complete solutions for your home, office and commercial projects.",
+    button: "View Products",
     link: "/products",
   },
   {
     type: "image",
-    image:
-      "https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    image: "https://images.pexels.com/photos/4249687/pexels-photo-4249687.jpeg",
     title: "Marble Statues & Mandirs",
     subtitle:
-      "Beautifully crafted marble statues and spiritual décor.",
-    cta: "Shop Statues",
+      "Elegant marble statues, mandirs and handcrafted decorative pieces.",
+    button: "Shop Statues",
     link: "/category/marble-statues",
   },
 ];
 
-export default function HomePage() {
+const TRUST_ITEMS = [
+  {
+    icon: Award,
+    title: "Premium Quality",
+    description: "Quality products selected for your needs",
+  },
+  {
+    icon: Truck,
+    title: "Safe Delivery",
+    description: "Reliable delivery for your order",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Trusted Service",
+    description: "Transparent and dependable service",
+  },
+  {
+    icon: Headphones,
+    title: "Expert Support",
+    description: "Get help choosing the right product",
+  },
+];
+
+export function HomePage() {
   const navigate = useNavigate();
 
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -86,9 +100,9 @@ export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // =========================================================
-  // PRELOAD HERO IMAGES
-  // =========================================================
+  /* --------------------------------
+     PRELOAD HERO IMAGES
+  -------------------------------- */
   useEffect(() => {
     HERO_SLIDES.forEach((slide) => {
       const image = new Image();
@@ -96,64 +110,58 @@ export default function HomePage() {
     });
   }, []);
 
-  // =========================================================
-  // AUTO SLIDER
-  // =========================================================
+  /* --------------------------------
+     AUTO HERO SLIDER
+  -------------------------------- */
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setCurrentSlide(
-        (previous) => (previous + 1) % HERO_SLIDES.length
-      );
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
     }, 10000);
 
-    return () => {
-      window.clearInterval(timer);
-    };
+    return () => window.clearInterval(timer);
   }, []);
 
-  // =========================================================
-  // LOAD HOME DATA
-  // =========================================================
+  /* --------------------------------
+     LOAD HOME DATA
+  -------------------------------- */
   const loadHomeData = useCallback(async () => {
-    setLoading(true);
-
     try {
-      const [categoriesResponse, productsResponse] =
-        await Promise.all([
-          supabase
-            .from("categories")
-            .select("*")
-            .order("name", { ascending: true }),
+      setLoading(true);
 
-          supabase
-            .from("products")
-            .select("*")
-            .eq("featured", true)
-            .limit(8),
-        ]);
+      const [categoriesResult, productsResult] = await Promise.all([
+        supabase
+          .from("categories")
+          .select("*")
+          .order("name", { ascending: true }),
 
-      if (categoriesResponse.error) {
+        supabase
+          .from("products")
+          .select("*")
+          .eq("featured", true)
+          .limit(8),
+      ]);
+
+      if (categoriesResult.error) {
         console.error(
-          "Categories loading error:",
-          categoriesResponse.error
+          "Failed to load categories:",
+          categoriesResult.error
         );
         setCategories([]);
       } else {
-        setCategories(categoriesResponse.data ?? []);
+        setCategories((categoriesResult.data || []) as Category[]);
       }
 
-      if (productsResponse.error) {
+      if (productsResult.error) {
         console.error(
-          "Products loading error:",
-          productsResponse.error
+          "Failed to load featured products:",
+          productsResult.error
         );
         setFeaturedProducts([]);
       } else {
-        setFeaturedProducts(productsResponse.data ?? []);
+        setFeaturedProducts((productsResult.data || []) as Product[]);
       }
     } catch (error) {
-      console.error("Home page data error:", error);
-
+      console.error("Home page data loading error:", error);
       setCategories([]);
       setFeaturedProducts([]);
     } finally {
@@ -165,39 +173,16 @@ export default function HomePage() {
     loadHomeData();
   }, [loadHomeData]);
 
-  // =========================================================
-  // SLIDER CONTROLS
-  // =========================================================
-  const previousSlide = () => {
-    setCurrentSlide(
-      (previous) =>
-        (previous - 1 + HERO_SLIDES.length) %
-        HERO_SLIDES.length
-    );
-  };
-
-  const nextSlide = () => {
-    setCurrentSlide(
-      (previous) => (previous + 1) % HERO_SLIDES.length
-    );
-  };
-
-  const goToSlide = (index: number) => {
-    setCurrentSlide(index);
-  };
-
-  const slide = HERO_SLIDES[currentSlide];
-
-  // =========================================================
-  // CATEGORY LINK
-  // =========================================================
+  /* --------------------------------
+     CATEGORY URL
+  -------------------------------- */
   const getCategoryLink = (category: Category) => {
-    const categoryWithSlug = category as Category & {
+    const categoryData = category as Category & {
       slug?: string | null;
     };
 
     const slug =
-      categoryWithSlug.slug?.trim() ||
+      categoryData.slug?.trim() ||
       String(category.name)
         .toLowerCase()
         .trim()
@@ -208,203 +193,260 @@ export default function HomePage() {
     return `/category/${slug}`;
   };
 
+  /* --------------------------------
+     SLIDER CONTROLS
+  -------------------------------- */
+  const previousSlide = () => {
+    setCurrentSlide(
+      (prev) => (prev - 1 + HERO_SLIDES.length) % HERO_SLIDES.length
+    );
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+  };
+
+  const currentHero = HERO_SLIDES[currentSlide];
+
+  /* --------------------------------
+     WHATSAPP ENQUIRY
+  -------------------------------- */
+  const handleWhatsApp = () => {
+    try {
+      const url = whatsappEnquiry(
+        "Hello, I would like to enquire about your marble, tiles and sanitaryware products."
+      );
+
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      console.error("WhatsApp enquiry error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      {/* =====================================================
-          HERO / CAROUSEL
-      ====================================================== */}
-      <section className="relative w-full h-[280px] sm:h-[330px] md:h-[400px] lg:h-[460px] overflow-hidden bg-white">
-        {slide.type === "emi" ? (
-          <div className="w-full h-full flex items-center justify-center bg-white">
-            <img
-              src={slide.image}
-              alt="Special EMI Offer"
-              className="w-full h-full object-contain"
-              loading="eager"
-              fetchPriority="high"
-            />
+      {/* =====================================
+          HERO SECTION
+      ===================================== */}
+      <section className="relative overflow-hidden bg-slate-900">
+        <div className="relative min-h-[520px] md:min-h-[620px]">
+          {HERO_SLIDES.map((slide, index) => (
+            <div
+              key={`${slide.image}-${index}`}
+              className={`absolute inset-0 transition-opacity duration-700 ${
+                currentSlide === index
+                  ? "opacity-100"
+                  : "pointer-events-none opacity-0"
+              }`}
+            >
+              <img
+                src={slide.image}
+                alt={slide.title || "Vaishnavi Marble"}
+                className="h-full w-full object-cover"
+              />
+
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-black/45" />
+
+              {/* EMI Slide */}
+              {slide.type === "emi" ? (
+                <div className="absolute inset-0 flex items-center justify-center px-4">
+                  <div className="max-w-5xl text-center text-white">
+                    <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-5 py-2 text-sm font-semibold backdrop-blur-sm">
+                      Special Offer
+                    </div>
+
+                    <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl">
+                      Easy EMI Available
+                    </h1>
+
+                    <p className="mx-auto mt-5 max-w-2xl text-lg text-white/90 md:text-xl">
+                      Make your dream home beautiful with premium marble,
+                      tiles and sanitaryware.
+                    </p>
+
+                    <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+                      <button
+                        type="button"
+                        onClick={() => navigate("/products")}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-3.5 font-bold text-slate-900 shadow-lg transition hover:bg-slate-100"
+                      >
+                        Explore Products
+                        <ArrowRight className="h-5 w-5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleWhatsApp}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-7 py-3.5 font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                      >
+                        <MessageCircle className="h-5 w-5" />
+                        Enquire on WhatsApp
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                /* Normal Hero Slide */
+                <div className="absolute inset-0 flex items-center">
+                  <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
+                    <div className="max-w-3xl text-white">
+                      <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
+                        Vaishnavi Marble & Tiles
+                      </div>
+
+                      <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl">
+                        {slide.title}
+                      </h1>
+
+                      <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/90 md:text-xl">
+                        {slide.subtitle}
+                      </p>
+
+                      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            slide.link && navigate(slide.link)
+                          }
+                          className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-7 py-3.5 font-bold text-slate-900 shadow-lg transition hover:bg-slate-100"
+                        >
+                          {slide.button || "Explore"}
+                          <ArrowRight className="h-5 w-5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleWhatsApp}
+                          className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-7 py-3.5 font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                        >
+                          <MessageCircle className="h-5 w-5" />
+                          WhatsApp Enquiry
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Previous */}
+          <button
+            type="button"
+            onClick={previousSlide}
+            aria-label="Previous slide"
+            className="absolute left-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition hover:bg-black/50"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+
+          {/* Next */}
+          <button
+            type="button"
+            onClick={nextSlide}
+            aria-label="Next slide"
+            className="absolute right-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm transition hover:bg-black/50"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+
+          {/* Dots */}
+          <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2">
+            {HERO_SLIDES.map((slide, index) => (
+              <button
+                key={`dot-${index}`}
+                type="button"
+                aria-label={`Go to slide ${index + 1}`}
+                onClick={() => setCurrentSlide(index)}
+                className={`h-2.5 rounded-full transition-all ${
+                  currentSlide === index
+                    ? "w-8 bg-white"
+                    : "w-2.5 bg-white/50 hover:bg-white/80"
+                }`}
+              />
+            ))}
           </div>
-        ) : (
-          <div className="relative w-full h-full">
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover"
-              loading="eager"
-            />
+        </div>
+      </section>
 
-            <div className="absolute inset-0 bg-black/40" />
+      {/* =====================================
+          TRUST STRIP
+      ===================================== */}
+      <section className="border-b bg-white">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y sm:grid-cols-4 sm:divide-y-0">
+          {TRUST_ITEMS.map((item) => {
+            const Icon = item.icon;
 
-            <div className="absolute inset-0 flex items-center">
-              <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-                <div className="max-w-2xl text-white">
-                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight">
-                    {slide.title}
-                  </h1>
+            return (
+              <div
+                key={item.title}
+                className="flex items-center gap-3 px-4 py-5 sm:px-6"
+              >
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100">
+                  <Icon className="h-5 w-5 text-slate-700" />
+                </div>
 
-                  <p className="mt-4 text-sm sm:text-base md:text-lg text-white/90 max-w-xl">
-                    {slide.subtitle}
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900">
+                    {item.title}
+                  </h3>
+                  <p className="mt-0.5 text-xs leading-5 text-slate-500">
+                    {item.description}
                   </p>
-
-                  <button
-                    type="button"
-                    onClick={() => navigate(slide.link)}
-                    className="mt-6 inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors"
-                  >
-                    {slide.cta}
-                    <ArrowRight size={18} />
-                  </button>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Previous */}
-        <button
-          type="button"
-          onClick={previousSlide}
-          aria-label="Previous slide"
-          className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-stone-800 transition-colors z-20"
-        >
-          <ChevronLeft size={22} />
-        </button>
-
-        {/* Next */}
-        <button
-          type="button"
-          onClick={nextSlide}
-          aria-label="Next slide"
-          className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-stone-800 transition-colors z-20"
-        >
-          <ChevronRight size={22} />
-        </button>
-
-        {/* Dots */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-          {HERO_SLIDES.map((_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => goToSlide(index)}
-              aria-label={`Go to slide ${index + 1}`}
-              className={`h-2.5 rounded-full transition-all ${
-                currentSlide === index
-                  ? "w-7 bg-white"
-                  : "w-2.5 bg-white/60 hover:bg-white/80"
-              }`}
-            />
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      {/* =====================================================
-          TRUST STRIP
-      ====================================================== */}
-      <section className="border-b border-stone-200 bg-white">
-        <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-stone-200">
-            <div className="flex items-center gap-3 py-5 px-3">
-              <Truck className="text-stone-700 shrink-0" size={24} />
-              <div>
-                <p className="font-semibold text-stone-800 text-sm">
-                  Fast Delivery
-                </p>
-                <p className="text-xs text-stone-500">
-                  Reliable shipping
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 py-5 px-3">
-              <ShieldCheck
-                className="text-stone-700 shrink-0"
-                size={24}
-              />
-              <div>
-                <p className="font-semibold text-stone-800 text-sm">
-                  Quality Assured
-                </p>
-                <p className="text-xs text-stone-500">
-                  Premium products
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 py-5 px-3">
-              <Award className="text-stone-700 shrink-0" size={24} />
-              <div>
-                <p className="font-semibold text-stone-800 text-sm">
-                  Trusted Service
-                </p>
-                <p className="text-xs text-stone-500">
-                  Years of experience
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 py-5 px-3">
-              <Headphones
-                className="text-stone-700 shrink-0"
-                size={24}
-              />
-              <div>
-                <p className="font-semibold text-stone-800 text-sm">
-                  Expert Support
-                </p>
-                <p className="text-xs text-stone-500">
-                  We are here to help
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
+      {/* =====================================
           CATEGORIES
-      ====================================================== */}
-      <section className="py-12 sm:py-16 bg-stone-50">
-        <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="flex items-end justify-between gap-4 mb-8">
+      ===================================== */}
+      <section className="bg-slate-50 py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
-                Explore
+              <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
+                Shop by Category
               </p>
 
-              <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-stone-900">
-                Shop by Category
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Explore Our Collections
               </h2>
+
+              <p className="mt-3 max-w-2xl text-slate-600">
+                Discover marble, tiles, sanitaryware, kitchen sinks,
+                bathroom vanities and more.
+              </p>
             </div>
 
             <button
               type="button"
-              onClick={() => navigate("/categories")}
-              className="hidden sm:flex items-center gap-1 text-sm font-semibold text-stone-700 hover:text-stone-900"
+              onClick={() => navigate("/products")}
+              className="inline-flex items-center gap-2 font-bold text-slate-900 hover:underline"
             >
-              View All
-              <ArrowRight size={16} />
+              View All Products
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-              {Array.from({ length: 6 }).map((_, index) => (
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+              {Array.from({ length: 8 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-40 bg-stone-200 rounded-xl animate-pulse"
+                  className="h-64 animate-pulse rounded-2xl bg-slate-200"
                 />
               ))}
             </div>
           ) : categories.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {categories.map((category) => {
                 const categoryData = category as Category & {
                   image_url?: string | null;
                 };
-
-                const categoryImage =
-                  categoryData.image_url || null;
 
                 return (
                   <button
@@ -413,84 +455,98 @@ export default function HomePage() {
                     onClick={() =>
                       navigate(getCategoryLink(category))
                     }
-                    className="group text-left"
+                    className="group overflow-hidden rounded-2xl bg-white text-left shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="aspect-square rounded-xl overflow-hidden bg-white border border-stone-200">
-                      {categoryImage ? (
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                      {categoryData.image_url ? (
                         <img
-                          src={categoryImage}
+                          src={categoryData.image_url}
                           alt={category.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-stone-400 text-sm">
+                        <div className="flex h-full items-center justify-center text-sm text-slate-400">
                           No Image
                         </div>
                       )}
-                    </div>
 
-                    <h3 className="mt-3 font-semibold text-stone-800 text-sm group-hover:text-stone-600 transition-colors">
-                      {category.name}
-                    </h3>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+                      <div className="absolute bottom-0 left-0 right-0 p-4">
+                        <h3 className="text-base font-bold text-white sm:text-lg">
+                          {category.name}
+                        </h3>
+                      </div>
+                    </div>
                   </button>
                 );
               })}
             </div>
           ) : (
-            <div className="text-center py-10 text-stone-500">
-              No categories available.
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
+              <h3 className="text-lg font-bold text-slate-900">
+                Categories Coming Soon
+              </h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Our product collections will appear here.
+              </p>
+
+              <button
+                type="button"
+                onClick={() => navigate("/products")}
+                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
+              >
+                Browse Products
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           )}
-
-          <button
-            type="button"
-            onClick={() => navigate("/categories")}
-            className="sm:hidden mt-6 mx-auto flex items-center gap-1 text-sm font-semibold text-stone-700"
-          >
-            View All Categories
-            <ArrowRight size={16} />
-          </button>
         </div>
       </section>
 
-      {/* =====================================================
+      {/* =====================================
           FEATURED PRODUCTS
-      ====================================================== */}
-      <section className="py-12 sm:py-16 bg-white">
-        <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="flex items-end justify-between gap-4 mb-8">
+      ===================================== */}
+      <section className="bg-white py-16 sm:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
-                Our Collection
+              <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
+                Featured Products
               </p>
 
-              <h2 className="mt-1 text-2xl sm:text-3xl font-bold text-stone-900">
-                Featured Products
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+                Popular Picks
               </h2>
+
+              <p className="mt-3 max-w-2xl text-slate-600">
+                Explore some of our featured products selected for your
+                home and projects.
+              </p>
             </div>
 
             <button
               type="button"
               onClick={() => navigate("/products")}
-              className="hidden sm:flex items-center gap-1 text-sm font-semibold text-stone-700 hover:text-stone-900"
+              className="inline-flex items-center gap-2 font-bold text-slate-900 hover:underline"
             >
               View All
-              <ArrowRight size={16} />
+              <ArrowRight className="h-4 w-4" />
             </button>
           </div>
 
           {loading ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div
                   key={index}
-                  className="h-96 bg-stone-100 rounded-xl animate-pulse"
+                  className="h-80 animate-pulse rounded-2xl bg-slate-100"
                 />
               ))}
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {featuredProducts.map((product) => (
                 <ProductCard
                   key={product.id}
@@ -499,130 +555,124 @@ export default function HomePage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-stone-50 rounded-xl">
-              <p className="text-stone-500">
-                No featured products available.
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
+              <h3 className="text-lg font-bold text-slate-900">
+                Featured Products Coming Soon
+              </h3>
+
+              <p className="mt-2 text-sm text-slate-500">
+                Products marked as featured in the admin panel will
+                appear here.
               </p>
+
+              <button
+                type="button"
+                onClick={() => navigate("/products")}
+                className="mt-5 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-bold text-white hover:bg-slate-800"
+              >
+                Browse All Products
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           )}
-
-          <button
-            type="button"
-            onClick={() => navigate("/products")}
-            className="sm:hidden mt-6 mx-auto flex items-center gap-1 text-sm font-semibold text-stone-700"
-          >
-            View All Products
-            <ArrowRight size={16} />
-          </button>
         </div>
       </section>
 
-      {/* =====================================================
-          ABOUT / OWNER
-      ====================================================== */}
-      <section className="py-12 sm:py-16 bg-stone-50">
-        <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div className="rounded-2xl overflow-hidden bg-white border border-stone-200">
+      {/* =====================================
+          ABOUT / OWNER SECTION
+      ===================================== */}
+      <section className="bg-slate-900 py-16 text-white sm:py-20">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="grid items-center gap-10 lg:grid-cols-2">
+            <div className="overflow-hidden rounded-3xl bg-slate-800">
               <img
                 src="/onwer.png"
-                alt="Owner"
-                className="w-full h-auto object-cover"
-                loading="lazy"
+                alt="Vaishnavi Marble"
+                className="h-full max-h-[520px] w-full object-cover"
               />
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-stone-500 uppercase tracking-wider">
-                About Us
+              <p className="text-sm font-bold uppercase tracking-wider text-white/60">
+                About Vaishnavi Marble
               </p>
 
-              <h2 className="mt-2 text-2xl sm:text-3xl lg:text-4xl font-bold text-stone-900">
-                Your Trusted Marble & Tiles Partner
+              <h2 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl">
+                Building Beautiful Spaces With Quality Materials
               </h2>
 
-              <p className="mt-5 text-stone-600 leading-relaxed">
-                We provide premium marble, granite, tiles,
-                sanitaryware, kitchen sinks, bathroom vanities
-                and other products for homes, offices and
-                commercial projects.
+              <p className="mt-6 text-base leading-8 text-white/75">
+                We offer a wide range of marble, granite, tiles,
+                sanitaryware, kitchen sinks, bathroom vanities and
+                other products for residential and commercial projects.
               </p>
 
-              <p className="mt-4 text-stone-600 leading-relaxed">
-                Our focus is on quality products, reliable
-                service and helping customers choose the right
-                solution for their space.
+              <p className="mt-4 text-base leading-8 text-white/75">
+                Whether you are building a new home, renovating your
+                bathroom or designing a commercial space, our team can
+                help you find suitable products for your requirements.
               </p>
 
-              <div className="mt-6 flex flex-wrap gap-3">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button
                   type="button"
-                  onClick={() => navigate("/about")}
-                  className="inline-flex items-center gap-2 bg-stone-900 text-white px-5 py-3 rounded-lg font-semibold hover:bg-stone-800 transition-colors"
+                  onClick={() => navigate("/products")}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3.5 font-bold text-slate-900 transition hover:bg-slate-100"
                 >
-                  Learn More
-                  <ArrowRight size={18} />
+                  Explore Products
+                  <ArrowRight className="h-5 w-5" />
                 </button>
 
-                <a
-                  href={whatsappEnquiry(
-                    "Hello, I would like to know more about your marble, tiles and sanitaryware products."
-                  )}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                <button
+                  type="button"
+                  onClick={handleWhatsApp}
+                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3.5 font-bold text-white transition hover:bg-white/10"
                 >
-                  <MessageCircle size={18} />
-                  WhatsApp
-                </a>
+                  <MessageCircle className="h-5 w-5" />
+                  Talk to Us
+                </button>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* =====================================================
+      {/* =====================================
           BULK / WHOLESALE CTA
-      ====================================================== */}
-      <section className="py-12 sm:py-16 bg-stone-900 text-white">
-        <div className="container mx-auto px-5 sm:px-8 lg:px-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div>
-              <p className="text-sm font-semibold text-stone-300 uppercase tracking-wider">
-                For Builders & Businesses
-              </p>
+      ===================================== */}
+      <section className="bg-slate-50 py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate-900 text-white">
+            <Phone className="h-6 w-6" />
+          </div>
 
-              <h2 className="mt-2 text-2xl sm:text-3xl font-bold">
-                Need Bulk or Wholesale Supply?
-              </h2>
+          <h2 className="mt-6 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+            Looking for Bulk or Project Requirements?
+          </h2>
 
-              <p className="mt-3 text-stone-300 max-w-2xl">
-                Contact us for project requirements, bulk orders,
-                wholesale pricing and product availability.
-              </p>
-            </div>
+          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
+            Contact us for project enquiries, bulk orders, product
+            availability and assistance with selecting the right
+            materials.
+          </p>
 
-            <div className="flex flex-wrap gap-3">
-              <a
-                href={whatsappEnquiry(
-                  "Hello, I need information about bulk/wholesale marble, tiles and sanitaryware supply."
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-              >
-                <MessageCircle size={18} />
-                WhatsApp Us
-              </a>
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={handleWhatsApp}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-7 py-3.5 font-bold text-white transition hover:bg-green-700"
+            >
+              <MessageCircle className="h-5 w-5" />
+              WhatsApp Enquiry
+            </button>
 
-              <a
-                href="tel:+919330300408"
-                className="inline-flex items-center gap-2 bg-white text-stone-900 px-5 py-3 rounded-lg font-semibold hover:bg-stone-100 transition-colors"
-              >
-                <Phone size={18} />
-                Call Us
-              </a>
-            </div>
+            <a
+              href="tel:+919999999999"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-7 py-3.5 font-bold text-slate-900 transition hover:bg-slate-100"
+            >
+              <Phone className="h-5 w-5" />
+              Call Us
+            </a>
           </div>
         </div>
       </section>
