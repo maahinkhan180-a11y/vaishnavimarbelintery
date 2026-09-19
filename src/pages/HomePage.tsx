@@ -100,9 +100,7 @@ export function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  /* =====================================
-     PRELOAD HERO IMAGES
-  ===================================== */
+  // Preload hero images
   useEffect(() => {
     HERO_SLIDES.forEach((slide) => {
       const image = new Image();
@@ -110,9 +108,7 @@ export function HomePage() {
     });
   }, []);
 
-  /* =====================================
-     AUTO SLIDER
-  ===================================== */
+  // Auto slider
   useEffect(() => {
     const timer = window.setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
@@ -121,9 +117,7 @@ export function HomePage() {
     return () => window.clearInterval(timer);
   }, []);
 
-  /* =====================================
-     LOAD CATEGORIES + PRODUCTS
-  ===================================== */
+  // Load categories and featured products
   const loadHomeData = useCallback(async () => {
     try {
       setLoading(true);
@@ -175,9 +169,7 @@ export function HomePage() {
     loadHomeData();
   }, [loadHomeData]);
 
-  /* =====================================
-     CATEGORY URL
-  ===================================== */
+  // Category URL
   const getCategoryLink = (category: Category) => {
     const categoryData = category as Category & {
       slug?: string | null;
@@ -195,9 +187,7 @@ export function HomePage() {
     return `/category/${slug}`;
   };
 
-  /* =====================================
-     SLIDER
-  ===================================== */
+  // Slider controls
   const previousSlide = () => {
     setCurrentSlide(
       (prev) =>
@@ -211,9 +201,7 @@ export function HomePage() {
     );
   };
 
-  /* =====================================
-     WHATSAPP
-  ===================================== */
+  // WhatsApp
   const handleWhatsApp = () => {
     try {
       const url = whatsappEnquiry(
@@ -256,25 +244,20 @@ export function HomePage() {
               {slide.type === "emi" ? (
                 <div className="absolute inset-0 flex items-center justify-center px-4">
                   <div className="max-w-5xl text-center text-white">
-
-                      <button
-                        type="button"
-                        onClick={handleWhatsApp}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-7 py-3.5 font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
-                      >
-                        <MessageCircle className="h-5 w-5" />
-                        Enquire on WhatsApp
-                      </button>
-
-                    </div>
+                    <button
+                      type="button"
+                      onClick={handleWhatsApp}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 bg-white/10 px-7 py-3.5 font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                    >
+                      <MessageCircle className="h-5 w-5" />
+                      Enquire on WhatsApp
+                    </button>
                   </div>
                 </div>
               ) : (
-
                 /* NORMAL SLIDE */
                 <div className="absolute inset-0 flex items-center">
                   <div className="mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10">
-
                     <div className="max-w-3xl text-white">
 
                       <div className="mb-4 inline-flex items-center rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur-sm">
@@ -290,7 +273,6 @@ export function HomePage() {
                       </p>
 
                       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-
                         <button
                           type="button"
                           onClick={() => {
@@ -312,8 +294,8 @@ export function HomePage() {
                           <MessageCircle className="h-5 w-5" />
                           WhatsApp Enquiry
                         </button>
-
                       </div>
+
                     </div>
                   </div>
                 </div>
@@ -357,6 +339,7 @@ export function HomePage() {
               />
             ))}
           </div>
+
         </div>
       </section>
 
@@ -401,7 +384,6 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
 
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-
             <div>
               <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                 Shop by Category
@@ -425,11 +407,9 @@ export function HomePage() {
               View All Products
               <ArrowRight className="h-4 w-4" />
             </button>
-
           </div>
 
           {loading ? (
-
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div
@@ -438,9 +418,7 @@ export function HomePage() {
                 />
               ))}
             </div>
-
           ) : categories.length > 0 ? (
-
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 
               {categories.map((category) => {
@@ -486,9 +464,7 @@ export function HomePage() {
               })}
 
             </div>
-
           ) : (
-
             <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
 
               <h3 className="text-lg font-bold text-slate-900">
@@ -510,6 +486,7 @@ export function HomePage() {
 
             </div>
           )}
+
         </div>
       </section>
 
@@ -520,7 +497,6 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
 
           <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-
             <div>
               <p className="mb-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                 Featured Products
@@ -544,11 +520,9 @@ export function HomePage() {
               View All
               <ArrowRight className="h-4 w-4" />
             </button>
-
           </div>
 
           {loading ? (
-
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div
@@ -557,9 +531,7 @@ export function HomePage() {
                 />
               ))}
             </div>
-
           ) : featuredProducts.length > 0 ? (
-
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 
               {featuredProducts.map((product) => (
@@ -570,9 +542,7 @@ export function HomePage() {
               ))}
 
             </div>
-
           ) : (
-
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 px-6 py-14 text-center">
 
               <h3 className="text-lg font-bold text-slate-900">
@@ -595,6 +565,7 @@ export function HomePage() {
 
             </div>
           )}
+
         </div>
       </section>
 
@@ -615,7 +586,6 @@ export function HomePage() {
             </div>
 
             <div>
-
               <p className="text-sm font-bold uppercase tracking-wider text-white/60">
                 About Vaishnavi Marble
               </p>
@@ -660,6 +630,7 @@ export function HomePage() {
             </div>
 
           </div>
+
         </div>
       </section>
 
@@ -703,6 +674,7 @@ export function HomePage() {
             </a>
 
           </div>
+
         </div>
       </section>
 
