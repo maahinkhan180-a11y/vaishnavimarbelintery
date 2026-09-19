@@ -8,7 +8,7 @@ import { Footer } from '@/components/Footer';
 import { CartDrawer } from '@/components/CartDrawer';
 import { EnquiryPopup } from '@/components/EnquiryPopup';
 
-import { HomePage } from '@/pages/HomePage';
+import { HomePage } from "@/pages/HomePage";
 import { CategoryPage } from '@/pages/CategoryPage';
 import { ProductPage } from '@/pages/ProductPage';
 import { CartPage } from '@/pages/CartPage';
