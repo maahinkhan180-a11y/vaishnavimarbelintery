@@ -4,7 +4,7 @@ Storefront built with React, Vite, Express, and MySQL. The same Node.js app serv
 
 ## Local development
 
-1. Create a MySQL database and run [`database/mysql-schema.sql`](./database/mysql-schema.sql). This single file creates all four tables and inserts the catalog data available here, including Marble Statues, Marble Home Interiors, and the 48 Tiles subcategories shown in the supplied screenshots. It is safe to run again; existing seed records are left unchanged.
+1. Create a MySQL database and run [`database/mysql-schema.sql`](./database/mysql-schema.sql). This single file creates all four tables and inserts the catalog data available here: 3 categories, 55 subcategories (including the 48 Tiles subcategories from the screenshots), and 69 sample products. It is safe to run again; existing seed records are left unchanged.
 2. Copy `.env.example` to `.env` for local development and fill in your local MySQL and admin settings. In Hostinger, add the same values using the Node.js app environment-variable settings; do not upload or commit `.env`.
 
    | Variable | Purpose |
@@ -52,8 +52,9 @@ secrets in `VITE_*` variables or commit them.
 
 The app no longer uses the Supabase client or Supabase environment variables. The SQL schema
 creates equivalent MySQL tables and inserts the catalog seed records available here, including
-the 48 Tiles subcategory names transcribed from the supplied screenshots. The screenshots do not
-contain product records, prices, or product images, and no live Supabase export or database
+the 48 Tiles subcategory names transcribed from the supplied screenshots and the 54 tile-product
+records provided separately. The screenshot itself does not contain product records, prices, or
+product images; the 54 supplied tile records have no image URLs. No live Supabase export or database
 credentials are present here. To migrate production data, export `categories`, `subcategories`,
 `products`, and `blog_articles` from Supabase, convert PostgreSQL UUIDs and `jsonb`/`text[]`
 fields to MySQL-compatible values (`specs` and `tags` are JSON), and import those records into
