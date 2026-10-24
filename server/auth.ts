@@ -1,5 +1,5 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 
 const COOKIE_NAME = 'admin_session';
 const SESSION_DURATION_SECONDS = 8 * 60 * 60;
@@ -14,9 +14,9 @@ function sign(value: string) {
   return createHmac('sha256', secret()).update(value).digest('base64url');
 }
 
-function getCookie(request: VercelRequest, name: string) {
+function getCookie(request: Request, name: string) {
   const cookieHeader = request.headers.cookie;
-  if (!cookieHeader) return undefined;
+  if (typeof cookieHeader !== 'string') return undefined;
   return cookieHeader.split(';').map(part => part.trim()).find(part => part.startsWith(`${name}=`))?.slice(name.length + 1);
 }
 
@@ -28,7 +28,7 @@ export function createSession(email: string) {
   return `${payload}.${sign(payload)}`;
 }
 
-export function getSessionEmail(request: VercelRequest) {
+export function getSessionEmail(request: Request) {
   if (!process.env.ADMIN_SESSION_SECRET) return null;
   const token = getCookie(request, COOKIE_NAME);
   if (!token) return null;
@@ -51,7 +51,7 @@ export function getSessionEmail(request: VercelRequest) {
   }
 }
 
-export function requireAdmin(request: VercelRequest, response: VercelResponse) {
+export function requireAdmin(request: Request, response: Response) {
   const email = getSessionEmail(request);
   if (!email) {
     response.status(401).json({ error: 'Authentication required' });
@@ -60,12 +60,12 @@ export function requireAdmin(request: VercelRequest, response: VercelResponse) {
   return email;
 }
 
-export function setSessionCookie(response: VercelResponse, token: string) {
+export function setSessionCookie(response: Response, token: string) {
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   response.setHeader('Set-Cookie', `${COOKIE_NAME}=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${SESSION_DURATION_SECONDS}${secure}`);
 }
 
-export function clearSessionCookie(response: VercelResponse) {
+export function clearSessionCookie(response: Response) {
   const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
   response.setHeader('Set-Cookie', `${COOKIE_NAME}=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0${secure}`);
 }

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import type { ExecuteValues, RowDataPacket } from 'mysql2';
 import { getPool } from '../server/db';
 import { getSessionEmail, requireAdmin } from '../server/auth';
@@ -9,8 +9,9 @@ const articleFields = [
   'published_at', 'updated_at', 'tags', 'is_published',
 ];
 
-function value(input: string | string[] | undefined) {
-  return Array.isArray(input) ? input[0] : input;
+function value(input: unknown) {
+  if (typeof input === 'string') return input;
+  return Array.isArray(input) && typeof input[0] === 'string' ? input[0] : undefined;
 }
 
 function isDatabaseValue(input: unknown): input is ExecuteValues {
@@ -18,7 +19,7 @@ function isDatabaseValue(input: unknown): input is ExecuteValues {
     || typeof input === 'boolean' || typeof input === 'bigint' || input instanceof Date;
 }
 
-export default async function handler(request: VercelRequest, response: VercelResponse) {
+export default async function handler(request: Request, response: Response) {
   try {
     if (request.method === 'GET') {
       const conditions: string[] = [];

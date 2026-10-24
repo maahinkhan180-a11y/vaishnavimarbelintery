@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import { createSession, setSessionCookie } from '../../server/auth';
 
 function matches(value: string, expected: string) {
@@ -8,7 +8,7 @@ function matches(value: string, expected: string) {
   return input.length === configured.length && timingSafeEqual(input, configured);
 }
 
-export default function handler(request: VercelRequest, response: VercelResponse) {
+export default function handler(request: Request, response: Response) {
   if (request.method !== 'POST') return response.status(405).json({ error: 'Method not allowed' });
 
   const { ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = process.env;

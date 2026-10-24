@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import { getPool } from '../server/db';
 
-export default async function handler(request: VercelRequest, response: VercelResponse) {
+export default async function handler(request: Request, response: Response) {
   if (request.method !== 'GET') return response.status(405).json({ error: 'Method not allowed' });
   try {
     await getPool().execute('SELECT 1');

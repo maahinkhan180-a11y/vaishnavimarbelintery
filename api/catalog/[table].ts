@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type { VercelRequest, VercelResponse } from '@vercel/node';
+import type { Request, Response } from 'express';
 import type { ExecuteValues, RowDataPacket } from 'mysql2';
 import { getPool } from '../../server/db';
 import { requireAdmin } from '../../server/auth';
@@ -16,8 +16,9 @@ const fields = {
 
 type CatalogTable = keyof typeof fields;
 
-function queryValue(value: string | string[] | undefined) {
-  return Array.isArray(value) ? value[0] : value;
+function queryValue(value: unknown) {
+  if (typeof value === 'string') return value;
+  return Array.isArray(value) && typeof value[0] === 'string' ? value[0] : undefined;
 }
 
 function normalizeRow(row: Record<string, unknown>) {
@@ -34,8 +35,8 @@ function isDatabaseValue(value: unknown): value is ExecuteValues {
     || typeof value === 'boolean' || typeof value === 'bigint' || value instanceof Date;
 }
 
-export default async function handler(request: VercelRequest, response: VercelResponse) {
-  const table = queryValue(request.query.table);
+export default async function handler(request: Request, response: Response) {
+  const table = queryValue(request.params.table) || queryValue(request.query.table);
   if (!table || !Object.prototype.hasOwnProperty.call(fields, table)) {
     return response.status(404).json({ error: 'Unknown catalog resource' });
   }
