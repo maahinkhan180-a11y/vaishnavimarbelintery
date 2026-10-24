@@ -74,14 +74,64 @@ CREATE TABLE IF NOT EXISTS blog_articles (
   INDEX idx_blog_published (is_published, published_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Seed catalog records available in the repository.
+-- Seed catalog records available in the repository and category names visible
+-- in the supplied storefront screenshots. The screenshots do not include products.
 -- These inserts are safe to re-run and leave existing records unchanged.
 INSERT INTO categories (id, name, slug, description, image_url, display_order) VALUES
+  ('20000000-0000-4000-8000-000000000003', 'Tiles', 'tiles', 'Browse tiles by space, finish, design, and type.', NULL, 1),
   ('20000000-0000-4000-8000-000000000001', 'Marble Statues', 'marble-statues', 'Hand-carved deity murtis in premium white and coloured marble. Radha Krishna, Sita Rama, Goddess Lakshmi, Maa Kali, Sai Baba and more.', 'https://images.pexels.com/photos/35587787/pexels-photo-35587787.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 7),
   ('20000000-0000-4000-8000-000000000002', 'Marble Home Interiors', 'marble-home-interiors', 'Marble mandirs, carved fireplaces & bespoke interior stonework for your home.', 'https://images.pexels.com/photos/37431602/pexels-photo-37431602.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 8)
 ON DUPLICATE KEY UPDATE id = id;
 
 INSERT INTO subcategories (id, category_id, name, slug, description, image_url, display_order) VALUES
+  ('20000000-0000-4000-8000-000000000021', '20000000-0000-4000-8000-000000000003', 'Floor Tiles', 'floor-tiles', NULL, NULL, 1),
+  ('20000000-0000-4000-8000-000000000022', '20000000-0000-4000-8000-000000000003', 'Wall Tiles', 'wall-tiles', NULL, NULL, 2),
+  ('20000000-0000-4000-8000-000000000023', '20000000-0000-4000-8000-000000000003', 'Bathroom Tiles', 'bathroom-tiles', NULL, NULL, 3),
+  ('20000000-0000-4000-8000-000000000024', '20000000-0000-4000-8000-000000000003', 'Kitchen Tiles', 'kitchen-tiles', NULL, NULL, 4),
+  ('20000000-0000-4000-8000-000000000025', '20000000-0000-4000-8000-000000000003', 'Living Room Tiles', 'living-room-tiles', NULL, NULL, 5),
+  ('20000000-0000-4000-8000-000000000026', '20000000-0000-4000-8000-000000000003', 'Outdoor Tiles', 'outdoor-tiles', NULL, NULL, 6),
+  ('20000000-0000-4000-8000-000000000027', '20000000-0000-4000-8000-000000000003', 'Parking Tiles', 'parking-tiles', NULL, NULL, 7),
+  ('20000000-0000-4000-8000-000000000028', '20000000-0000-4000-8000-000000000003', 'Bedroom Tiles', 'bedroom-tiles', NULL, NULL, 8),
+  ('20000000-0000-4000-8000-000000000029', '20000000-0000-4000-8000-000000000003', 'Elevation Tiles', 'elevation-tiles', NULL, NULL, 9),
+  ('20000000-0000-4000-8000-000000000030', '20000000-0000-4000-8000-000000000003', 'Balcony Tiles', 'balcony-tiles', NULL, NULL, 10),
+  ('20000000-0000-4000-8000-000000000031', '20000000-0000-4000-8000-000000000003', 'Pooja Room Tiles', 'pooja-room-tiles', NULL, NULL, 11),
+  ('20000000-0000-4000-8000-000000000032', '20000000-0000-4000-8000-000000000003', 'Stair Tiles', 'stair-tiles', NULL, NULL, 12),
+  ('20000000-0000-4000-8000-000000000033', '20000000-0000-4000-8000-000000000003', 'Anti Skid Tiles', 'anti-skid-tiles', NULL, NULL, 13),
+  ('20000000-0000-4000-8000-000000000034', '20000000-0000-4000-8000-000000000003', 'Glossy Tiles', 'glossy-tiles', NULL, NULL, 14),
+  ('20000000-0000-4000-8000-000000000035', '20000000-0000-4000-8000-000000000003', 'Polished Tiles', 'polished-tiles', NULL, NULL, 15),
+  ('20000000-0000-4000-8000-000000000036', '20000000-0000-4000-8000-000000000003', 'Matt Tiles', 'matt-tiles', NULL, NULL, 16),
+  ('20000000-0000-4000-8000-000000000037', '20000000-0000-4000-8000-000000000003', 'Carving Tiles', 'carving-tiles', NULL, NULL, 17),
+  ('20000000-0000-4000-8000-000000000038', '20000000-0000-4000-8000-000000000003', 'Metallic Tiles', 'metallic-tiles', NULL, NULL, 18),
+  ('20000000-0000-4000-8000-000000000039', '20000000-0000-4000-8000-000000000003', 'Rustic Tiles', 'rustic-tiles', NULL, NULL, 19),
+  ('20000000-0000-4000-8000-000000000040', '20000000-0000-4000-8000-000000000003', 'Lappato Tiles', 'lappato-tiles', NULL, NULL, 20),
+  ('20000000-0000-4000-8000-000000000041', '20000000-0000-4000-8000-000000000003', 'Satin Tiles', 'satin-tiles', NULL, NULL, 21),
+  ('20000000-0000-4000-8000-000000000042', '20000000-0000-4000-8000-000000000003', 'Hi-Gloss Tiles', 'hi-gloss-tiles', NULL, NULL, 22),
+  ('20000000-0000-4000-8000-000000000043', '20000000-0000-4000-8000-000000000003', 'Wall Panels', 'wall-panels', NULL, NULL, 23),
+  ('20000000-0000-4000-8000-000000000044', '20000000-0000-4000-8000-000000000003', 'Fluted Panels', 'fluted-panels', NULL, NULL, 24),
+  ('20000000-0000-4000-8000-000000000045', '20000000-0000-4000-8000-000000000003', '3D Tiles', '3d-tiles', NULL, NULL, 25),
+  ('20000000-0000-4000-8000-000000000046', '20000000-0000-4000-8000-000000000003', 'Wooden Tiles', 'wooden-tiles', NULL, NULL, 26),
+  ('20000000-0000-4000-8000-000000000047', '20000000-0000-4000-8000-000000000003', 'Marble Tiles', 'marble-tiles', NULL, NULL, 27),
+  ('20000000-0000-4000-8000-000000000048', '20000000-0000-4000-8000-000000000003', 'Texture Tiles', 'texture-tiles', NULL, NULL, 28),
+  ('20000000-0000-4000-8000-000000000049', '20000000-0000-4000-8000-000000000003', 'Mosaic Tiles', 'mosaic-tiles', NULL, NULL, 29),
+  ('20000000-0000-4000-8000-000000000050', '20000000-0000-4000-8000-000000000003', 'Granite Tiles', 'granite-tiles', NULL, NULL, 30),
+  ('20000000-0000-4000-8000-000000000051', '20000000-0000-4000-8000-000000000003', 'Stone Tiles', 'stone-tiles', NULL, NULL, 31),
+  ('20000000-0000-4000-8000-000000000052', '20000000-0000-4000-8000-000000000003', 'Pattern Tiles', 'pattern-tiles', NULL, NULL, 32),
+  ('20000000-0000-4000-8000-000000000053', '20000000-0000-4000-8000-000000000003', 'Geometric Tiles', 'geometric-tiles', NULL, NULL, 33),
+  ('20000000-0000-4000-8000-000000000054', '20000000-0000-4000-8000-000000000003', 'Cement Tiles', 'cement-tiles', NULL, NULL, 34),
+  ('20000000-0000-4000-8000-000000000055', '20000000-0000-4000-8000-000000000003', 'Travertine Tiles', 'travertine-tiles', NULL, NULL, 35),
+  ('20000000-0000-4000-8000-000000000056', '20000000-0000-4000-8000-000000000003', 'Terrazzo Tiles', 'terrazzo-tiles', NULL, NULL, 36),
+  ('20000000-0000-4000-8000-000000000057', '20000000-0000-4000-8000-000000000003', 'Vitrified Tiles', 'vitrified-tiles', NULL, NULL, 37),
+  ('20000000-0000-4000-8000-000000000058', '20000000-0000-4000-8000-000000000003', 'Ceramic Tiles', 'ceramic-tiles', NULL, NULL, 38),
+  ('20000000-0000-4000-8000-000000000059', '20000000-0000-4000-8000-000000000003', 'Porcelain Tiles', 'porcelain-tiles', NULL, NULL, 39),
+  ('20000000-0000-4000-8000-000000000060', '20000000-0000-4000-8000-000000000003', 'Designer Tiles', 'designer-tiles', NULL, NULL, 40),
+  ('20000000-0000-4000-8000-000000000061', '20000000-0000-4000-8000-000000000003', 'Digital Tiles', 'digital-tiles', NULL, NULL, 41),
+  ('20000000-0000-4000-8000-000000000062', '20000000-0000-4000-8000-000000000003', 'Glazed Tiles', 'glazed-tiles', NULL, NULL, 42),
+  ('20000000-0000-4000-8000-000000000063', '20000000-0000-4000-8000-000000000003', 'Cool Tiles', 'cool-tiles', NULL, NULL, 43),
+  ('20000000-0000-4000-8000-000000000064', '20000000-0000-4000-8000-000000000003', 'Printed Tiles', 'printed-tiles', NULL, NULL, 44),
+  ('20000000-0000-4000-8000-000000000065', '20000000-0000-4000-8000-000000000003', 'Nano Tiles', 'nano-tiles', NULL, NULL, 45),
+  ('20000000-0000-4000-8000-000000000066', '20000000-0000-4000-8000-000000000003', 'Imported Tiles', 'imported-tiles', NULL, NULL, 46),
+  ('20000000-0000-4000-8000-000000000067', '20000000-0000-4000-8000-000000000003', 'Italian Tiles', 'italian-tiles', NULL, NULL, 47),
+  ('20000000-0000-4000-8000-000000000068', '20000000-0000-4000-8000-000000000003', 'Spanish Tiles', 'spanish-tiles', NULL, NULL, 48),
   ('20000000-0000-4000-8000-000000000011', '20000000-0000-4000-8000-000000000001', 'Radha Krishna Statue', 'radha-krishna-statue', 'Hand-carved Radha Krishna marble murti with intricate detailing.', 'https://images.pexels.com/photos/35587787/pexels-photo-35587787.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 1),
   ('20000000-0000-4000-8000-000000000012', '20000000-0000-4000-8000-000000000001', 'Sita Rama Statue', 'sita-rama-statue', 'Premium marble Sita Rama murti with fine craftsmanship.', 'https://images.pexels.com/photos/18382817/pexels-photo-18382817.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 2),
   ('20000000-0000-4000-8000-000000000013', '20000000-0000-4000-8000-000000000001', 'Goddess Lakshmi Statue', 'goddess-lakshmi-statue', 'Beautifully crafted Goddess Lakshmi marble statue with ornate details.', 'https://images.pexels.com/photos/15164157/pexels-photo-15164157.jpeg?auto=compress&cs=tinysrgb&h=650&w=940', 3),

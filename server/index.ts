@@ -1,7 +1,7 @@
+import 'dotenv/config';
 import path from 'node:path';
 import { createServer } from 'node:http';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
 import blog from '../api/blog';
 import health from '../api/health';
 import catalog from '../api/catalog/[table]';
@@ -32,6 +32,7 @@ if (isProduction) {
     return response.sendFile(path.join(distDirectory, 'index.html'));
   });
 } else {
+  const { createServer: createViteServer } = await import('vite');
   const vite = await createViteServer({
     server: {
       middlewareMode: true,

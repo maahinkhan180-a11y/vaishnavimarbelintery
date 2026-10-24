@@ -4,8 +4,8 @@ Storefront built with React, Vite, Express, and MySQL. The same Node.js app serv
 
 ## Local development
 
-1. Create a MySQL database and run [`database/mysql-schema.sql`](./database/mysql-schema.sql). This single file creates all four tables and inserts the catalog seed records included in this repository (Marble Statues and Marble Home Interiors). It is safe to run again; existing seed records are left unchanged.
-2. Configure these environment variables in your local shell and in Hostinger's Node.js app settings:
+1. Create a MySQL database and run [`database/mysql-schema.sql`](./database/mysql-schema.sql). This single file creates all four tables and inserts the catalog data available here, including Marble Statues, Marble Home Interiors, and the 48 Tiles subcategories shown in the supplied screenshots. It is safe to run again; existing seed records are left unchanged.
+2. Copy `.env.example` to `.env` for local development and fill in your local MySQL and admin settings. In Hostinger, add the same values using the Node.js app environment-variable settings; do not upload or commit `.env`.
 
    | Variable | Purpose |
    | --- | --- |
@@ -22,17 +22,38 @@ Storefront built with React, Vite, Express, and MySQL. The same Node.js app serv
    Keep these values server-side. Do not add them to `VITE_*` variables or commit them.
 3. Run `npm install`, then start the app and API together with `npm run dev`.
 
-For Hostinger, use a plan that supports Node.js applications, upload the project, run `npm install`
-and `npm run build`, then set the start command to `npm start`. Set the app's `PORT` as required
-by Hostinger and configure the MySQL connection values from hPanel. Use the database hostname
-and credentials shown by Hostinger; don't assume the database host is `localhost`. The admin login
-uses an HTTP-only, same-site cookie; all catalog and blog writes require a valid admin session.
+## Hostinger deployment
+
+1. In hPanel, create a MySQL database and user, grant that user access, and note the hostname,
+   port, database name, username, and password. The database host may not be `localhost`.
+2. Create the tables and repository seed data by importing `database/mysql-schema.sql` in
+   phpMyAdmin's **Import** tab. Alternatively, from Command Prompt in the project root run:
+
+   ```text
+   mysql -h YOUR_MYSQL_HOST -P 3306 -u YOUR_MYSQL_USER -p YOUR_MYSQL_DATABASE < database/mysql-schema.sql
+   ```
+
+   Enter the database password when prompted. This initializes the schema and the sample data
+   available in this repository; it does not contain a live Supabase export.
+3. Use a Hostinger plan with Node.js application support. Upload the project or connect its Git
+   repository, choose the project root, and set the Node.js version supported by Hostinger.
+4. Set the build command to `npm install && npm run build` and the start command to `npm start`.
+   Configure the environment variables below in the Hostinger Node.js app settings, then start
+   or restart the application. Hostinger provides the port; the app listens on `process.env.PORT`.
+5. Open `https://YOUR_DOMAIN/api/health`. A working database connection returns
+   `{"databaseConnected":true}`. If it returns `503`, check the MySQL host, credentials, user
+   permissions, and TLS setting in hPanel.
+
+The admin login uses an HTTP-only, same-site cookie; all catalog and blog writes require a valid
+admin session. Use a long random `ADMIN_SESSION_SECRET` and strong admin password. Do not put
+secrets in `VITE_*` variables or commit them.
 
 ## Supabase data transfer
 
 The app no longer uses the Supabase client or Supabase environment variables. The SQL schema
-creates equivalent MySQL tables and inserts the catalog seed records checked into this
-repository. It cannot include live Supabase records because no Supabase export or database
+creates equivalent MySQL tables and inserts the catalog seed records available here, including
+the 48 Tiles subcategory names transcribed from the supplied screenshots. The screenshots do not
+contain product records, prices, or product images, and no live Supabase export or database
 credentials are present here. To migrate production data, export `categories`, `subcategories`,
 `products`, and `blog_articles` from Supabase, convert PostgreSQL UUIDs and `jsonb`/`text[]`
 fields to MySQL-compatible values (`specs` and `tags` are JSON), and import those records into
