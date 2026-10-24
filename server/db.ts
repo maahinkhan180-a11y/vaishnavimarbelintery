@@ -1,5 +1,9 @@
 import mysql from 'mysql2/promise';
 
+declare const process: {
+  env: Record<string, string | undefined>;
+};
+
 let pool: mysql.Pool | undefined;
 
 export function getPool() {
