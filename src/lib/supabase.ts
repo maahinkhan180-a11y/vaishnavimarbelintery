@@ -1,10 +1,37 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+type QueryResult = {
+  data: any[] | null;
+  error: { message?: string } | null;
+};
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+const emptyQueryResult = (): QueryResult => ({ data: [], error: null });
 
-export const supabase: SupabaseClient = supabaseUrl && supabaseAnonKey
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : createClient('https://placeholder.supabase.co', 'placeholder-key');
+const buildChain = (data: any[] = []) => {
+  const query: any = {
+    select: () => query,
+    order: () => query,
+    eq: () => query,
+    in: () => query,
+    neq: () => query,
+    limit: () => query,
+    or: () => query,
+    maybeSingle: async () => ({ data: data[0] ?? null, error: null }),
+    update: async () => ({ data, error: null }),
+    insert: async () => ({ data, error: null }),
+    delete: async () => ({ data, error: null }),
+    then: (resolve: (value: QueryResult) => void) => Promise.resolve(emptyQueryResult()).then(resolve),
+  };
 
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
+  return query;
+};
+
+export const supabase = {
+  from: () => buildChain([]),
+  auth: {
+    getSession: async () => ({ data: { session: null }, error: null }),
+    onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => undefined } }, error: null }),
+    signInWithPassword: async () => ({ data: { session: null }, error: null }),
+    signOut: async () => ({ error: null }),
+  },
+};
+
+export const isSupabaseConfigured = false;

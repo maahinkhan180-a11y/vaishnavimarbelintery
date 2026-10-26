@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 import type { Product } from '@/types';
 import { ProductCard } from '@/components/ProductCard';
+import { api } from '@/lib/api';
 
 export function SearchPage({ query }: { query: string }) {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,13 +10,14 @@ export function SearchPage({ query }: { query: string }) {
 
   useEffect(() => {
     setLoading(true);
-    supabase
-      .from('products')
-      .select('*')
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%,brand.ilike.%${query}%,material.ilike.%${query}%`)
-      .order('display_order')
-      .then(({ data }) => {
-        setProducts(data ?? []);
+
+    api.searchProducts(query)
+      .then((data) => {
+        setProducts((data ?? []) as Product[]);
+        setLoading(false);
+      })
+      .catch(() => {
+        setProducts([]);
         setLoading(false);
       });
   }, [query]);

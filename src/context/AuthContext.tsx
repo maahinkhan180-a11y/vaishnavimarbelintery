@@ -1,9 +1,8 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import type { Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { api } from '@/lib/api';
 
 interface AuthContextValue {
-  session: Session | null;
+  session: any | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
@@ -12,30 +11,27 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<Session | null>(null);
+  const [session, setSession] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setLoading(false);
-    });
-
-    return () => listener.subscription.unsubscribe();
-  }, []);
-
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    try {
+      const result = await api.login(email, password);
+      if (result?.token) {
+        localStorage.setItem('auth_token', result.token);
+        setSession({ user: result.user ?? { email } });
+        setLoading(false);
+        return { error: null };
+      }
+      return { error: result?.message || 'Login failed' };
+    } catch (error: any) {
+      return { error: error?.message || 'Login failed' };
+    }
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('auth_token');
+    setSession(null);
   };
 
   return (
